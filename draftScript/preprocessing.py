@@ -34,7 +34,7 @@ def set_duration(rawData):
         elif pd.isna(udp[i]):
             deltas[i] = tcp[i]
         elif pd.isna(tcp[i]) and pd.isna(udp[i]):
-            deltas[i] = 0
+            deltas[i] = 0.0
 
     return deltas
 
@@ -57,7 +57,8 @@ for file in csvs:
     #caso da gestire: caso in cui file CSV sia vuoto
     df = pd.read_csv(f"{CSV_PATH + file}")
 
-    cleaData = pd.DataFrame({"Number" : df['frame.number'].to_numpy(),
+    cleaData = pd.DataFrame({"Label" : np.zeros(len(df)), #TODO: da sostituire con algoritmo di etichettatura
+                            "Number" : df['frame.number'].to_numpy(),
                             "Time" : df['frame.time'].to_numpy(),
                             "SrcIP" : IP_to_integer(df['ip.src']),
                             "SrcPort" : set_port(df, 'src'),
@@ -67,4 +68,4 @@ for file in csvs:
                             "Length" : df['frame.len'].to_numpy(),
                             "Duration" : set_duration(df)})
 
-    cleaData.to_csv(f'{CSV_PATH}prova.csv')
+    cleaData.to_csv(f'{CSV_PATH}prova.csv', index=False)
