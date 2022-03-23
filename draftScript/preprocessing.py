@@ -1,8 +1,8 @@
-'''
+"""
   * conversione dell'indirizzo IP in numero;
   * aggregare le porta (TCP o UDP) in una singola colonna
   * aggregare i delta (TCP o UDP) in una singola colonna
-'''
+"""
 
 import pandas as pd
 import numpy as np
@@ -49,23 +49,22 @@ def IP_to_integer(data):
 
     return ips
 
-
 CSV_PATH = "../dataset/raw/csv/"
-csvs = os.listdir(CSV_PATH)
 
-for file in csvs:
-    #caso da gestire: caso in cui file CSV sia vuoto
-    df = pd.read_csv(f"{CSV_PATH + file}")
+for d in os.listdir(CSV_PATH):
+    for csv in os.listdir(f"{CSV_PATH + d}"):
+        #caso da gestire: caso in cui file CSV sia vuoto
+        df = pd.read_csv(f"{CSV_PATH + d}/{csv}")
 
-    cleaData = pd.DataFrame({"Label" : np.zeros(len(df)), #TODO: da sostituire con algoritmo di etichettatura
-                            "Number" : df['frame.number'].to_numpy(),
-                            "Time" : df['frame.time'].to_numpy(),
-                            "SrcIP" : IP_to_integer(df['ip.src']),
-                            "SrcPort" : set_port(df, 'src'),
-                            "DstIP" : IP_to_integer(df['ip.dst']),
-                            "DstPort" : set_port(df, 'dst'),
-                            "Protocol" : df['ip.proto'].to_numpy(),
-                            "Length" : df['frame.len'].to_numpy(),
-                            "Duration" : set_duration(df)})
+        cleaData = pd.DataFrame({"Label" : np.array(d for i in range(0, len(df))),
+                                #"Number" : df['frame.number'].to_numpy(),
+                                #"Time" : df['frame.time'].to_numpy(),
+                                "SrcIP" : IP_to_integer(df['ip.src']).astype(int),
+                                "SrcPort" : set_port(df, 'src').astype(int),
+                                "DstIP" : IP_to_integer(df['ip.dst']).astype(int),
+                                "DstPort" : set_port(df, 'dst').astype(int),
+                                "Protocol" : df['ip.proto'].to_numpy(),
+                                "Length" : df['frame.len'].to_numpy(),
+                                "Duration" : set_duration(df)})
 
-    cleaData.to_csv(f'{CSV_PATH}prova.csv', index=False)
+        cleaData.to_csv(f'../dataset/data/{d}_{csv.replace(".csv", "")}.csv', index=False)
