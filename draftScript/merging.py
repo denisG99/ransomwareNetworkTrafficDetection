@@ -4,7 +4,6 @@ import os
 DATA_PATH = '../dataset/data/'
 CONNECTION_PATH = '../dataset/connection/'
 
-#TODO: valutare versione ricorsiva
 def CSV_merging(dest_df, files_path):
     for csv in os.listdir(files_path):
         df = pd.read_csv(f'{files_path + csv}')
