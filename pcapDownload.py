@@ -1,15 +1,18 @@
+#TODO: script da testare
+
 import pysftp as sftp
+from pysftp import AuthenticationException
 import os
 
 HOST = '142.104.64.196'
 PORT = 22
-USERNAME = 'gasparollo'
-PSW = '' #TODO: da inserire
+USERNAME = ''
+PSW = 'gasparollo'
 PVT_KEY_PATH = '/Users/denisgasparollo/.ssh/id_rsa'
 PVT_KEY_PSW = '' #inserire nel caso in cui la chiave privata ssh sia protetta da password
 DOWNLOAD_LOCAL_PATH = '/Users/denisgasparollo/Desktop/dataset'
 
-def download(conn, remote_path, extension, local_path):
+'''def download(conn, remote_path, extension, local_path):
     log_file = open('dwn_log.txt', mode='a')
 
     for file in conn.listdir:
@@ -31,14 +34,14 @@ def download(conn, remote_path, extension, local_path):
 
                 return None
 
-    log_file.close()
+    log_file.close()'''
 
 try:
     conn = sftp.Connection(host=HOST, port= PORT, username=USERNAME, password=PSW, private_key=PVT_KEY_PATH, private_key_pass=PVT_KEY_PSW)
     print('Connessione riuscita')
-except :
+
+    # download(conn, conn.getcwd(), '.pcap', DOWNLOAD_LOCAL_PATH)
+except AuthenticationException:
     print('Connessione non riuscita')
 
-download(conn, conn.getcwd(), '.pcap', DOWNLOAD_LOCAL_PATH)
-
-conn.close()
+#conn.close()
