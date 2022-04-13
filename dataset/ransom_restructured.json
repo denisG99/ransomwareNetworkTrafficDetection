@@ -4,73 +4,85 @@
             "SamplePcap": "samplesPcap_compress/Crysis_19112018.pcap.gz",
             "Hash": "2320470fb6b6d14d1a63c652c2135f20",
             "Link": "https://www.hybrid-analysis.com/sample/bf20b92755cd5c2542cdcef804ee795932cc4b0e070ca6b81ff8fd30908a8f97?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Cryxox_27122018.pcap.gz",
             "Hash": "7cc1402c8d3b33f91da147597ed4dd47",
             "Link": "https://www.hybrid-analysis.com/sample/e75ee5dcc9921d016f9d33989cfebe97db006354699f7d005d82801a3daa8920?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_17092018.pcap.gz",
             "Hash": "e9d396504c415eb746396ec310eacd1f",
             "Link": "https://www.hybrid-analysis.com/sample/05fd72a70e0604da8e888b1ecbab2e3ca77fe079a2abe06157769e30e22dedcd?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_15112018.pcap.gz",
             "Hash": "2bbb2d9be1a993a8dfef0dd719c589a0",
             "Link": "https://www.hybrid-analysis.com/sample/bf20b92755cd5c2542cdcef804ee795932cc4b0e070ca6b81ff8fd30908a8f97?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_19122016.pcap.gz",
             "Hash": "ab1118c42718a9b33fb180c58f84cab4",
             "Link": "https://www.hybrid-analysis.com/sample/d211f2dc1401d4d0939e8a8b990a9f7330d8943a3e4f9459aea9ca3aad5f614d?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_18112018.pcap.gz",
             "Hash": "d32e4d8b4238cfcc793ec3b37cc9a875",
             "Link": "https://www.hybrid-analysis.com/sample/17b78fc69818c9cd55f67786c9859219adb52a2ef3baf2d781f1b84a05c838fd?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Dharma_01012017.pcap.gz",
             "Hash": "809307c7a15b9930aa9d03e35eb87b10",
             "Link": "https://www.hybrid-analysis.com/sample/37932b22c97851ae7b71c7515f32e923ac9e94d337c39333abddbc979d4fcce2?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_12042018.pcap.gz",
             "Hash": "64310a2f895b55a32fbe5ec86f90d090",
             "Link": "https://www.hybrid-analysis.com/sample/d62840dc0ba37874da5a25a7cad8eebecd0d503ef650c8b4f4caf674a4bb53a3?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Dharma_18062020.pcap.gz",
             "Hash": "d8b506b604daf44858f635c9496d0e59",
             "Link": "https://www.hybrid-analysis.com/sample/0f535af00bfe779092695a9b52daf1116da981b54d7ee4aefe702c5b662ba140?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Shaofao_20082020.pcap.gz",
             "Hash": "a822d8ae2979a58e3da4132822169cff",
             "Link": "https://www.hybrid-analysis.com/sample/1ea46702e232b2a60d168a93d42053ed9043bf98fe4a2b5a8057c73e0ee3e3c4/5f3e85efaecaec176b4ff152",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Dharma_23082020.pcap.gz",
             "Hash": "cd28f7461f4796a94d0bdd0c6626a5c9",
             "Link": "https://www.hybrid-analysis.com/sample/9757387fe179cfff459275a5f0c88d75ec5426480c09184db2d3e286ffed7c78/5f41b878b4f43f0f6a636e1c",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Dharma_23062021.pcap.gz",
             "Hash": "4bec9c3bc8fceb9672173bb33f84a8d1",
             "Link": "https://www.hybrid-analysis.com/sample/9459d3fff78ad0b57464dff56a096d1c8c4de55c7e75f7d548869d7bc2cbd90e/60d33b8d073cfe24b47c42be",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         }
     ],
     "Zeus": [
@@ -78,7 +90,8 @@
             "SamplePcap": "samplesPcap_compress/Zeus_31102017.pcap.gz",
             "Hash": "aa976dd25d299d74ee4128f09469b902",
             "Link": "https://www.hybrid-analysis.com/sample/fd922a85483a3abae79203ac96c6f2926a5f1f62f93c009742b64fc3cb669320?environmentId=120",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Zeus"
         }
     ],
     "Cerber": [
@@ -86,91 +99,106 @@
             "SamplePcap": "samplesPcap_compress/cerber_11122016.pcap.gz",
             "Hash": "b53a2061750f723b1ef0e35ee2973843",
             "Link": "https://www.malware-traffic-analysis.net/2016/12/11/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_22122016.pcap.gz",
             "Hash": "21a6db03b58e719920109cd1ba0f6dd8",
             "Link": "https://www.malware-traffic-analysis.net/2016/12/22/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_07112016.pcap.gz",
             "Hash": "0622a02669cffd432c55089e16eac512",
             "Link": "https://www.malware-traffic-analysis.net/2016/11/07/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_03102016.pcap.gz",
             "Hash": "b17ff50e5abca3e850a433af42107314",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/03/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_05102016.pcap.gz",
             "Hash": "b423c1eaca3ca58738389804763117e6",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/05/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_28112016.pcap.gz",
             "Hash": "6ca6ee2f76c57a973675a32e3dc2bea6",
             "Link": "https://www.malware-traffic-analysis.net/2016/11/28/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_31102016.pcap.gz",
             "Hash": "ef914118b3a6e09bb0832204d7296829",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/31/index3.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_20012017.pcap.gz",
             "Hash": "7d0c2f75918c5df68fd1edd71e5e8bdf",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/20/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_04012017.pcap.gz",
             "Hash": "1f41be13d5d19e1a5c76b6d7256a8df4",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/04/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_12102016.pcap.gz",
             "Hash": "0e6d96d1236d285b84cda050dddd7e54",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/12/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_24012017.pcap.gz",
             "Hash": "67526df5413c58c145bc2e36536ae67f",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/24/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_06022017.pcap.gz",
             "Hash": "b65f05882c80f469d1deff355e073684",
             "Link": "https://www.malware-traffic-analysis.net/2017/02/06/index4.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_04102016.pcap.gz",
             "Hash": "6094502bad521cce683cf57ab39aeb98",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/04/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_10082016.pcap.gz",
             "Hash": "e8d33b26c99ff3f91211ee21b97bdda1",
             "Link": "https://www.malware-traffic-analysis.net/2016/08/10/index.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/cerber_25062021.pcap.gz",
             "Hash": "d596bec4e3cb526f786d68a0fbbf77b5",
             "Link": "https://www.hybrid-analysis.com/sample/b6aed3ae2f4d29839b3fd7b909d6a31f188bb9a6daecf1ba300de81ce94dd65b/60c8f84f1da735067d77ba44",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         }
     ],
     "CTB-Locker": [
@@ -178,7 +206,8 @@
             "SamplePcap": "samplesPcap_compress/CTBLocker_27012017.pcap.gz",
             "Hash": "be62854618491cb4fe30b2299102bb1b",
             "Link": "https://www.hybrid-analysis.com/sample/4b747f699cdab219152094dd541ebcb6da7e47bbcc8fb33b226b0013d4c7d7f2?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "CTB-Locker"
         }
     ],
     "Locky": [
@@ -186,61 +215,71 @@
             "SamplePcap": "samplesPcap_compress/Locky_03052016.pcap.gz",
             "Hash": "1bd1853931b3bcafb268493202a90c29",
             "Link": "https://www.malware-traffic-analysis.net/2016/05/03/index.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_18082016.pcap.gz",
             "Hash": "8c3a6828ae5115978daef9f7fd08fb34",
             "Link": "https://www.hybrid-analysis.com/sample/64138ac3670ea7d3adacb5d3b90a473065fd5fad5d348a037b89640a00230208?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Diablo6_15082017.pcap.gz",
             "Hash": "50a392bfad46858196490e6e38935d33",
             "Link": "https://www.hybrid-analysis.com/sample/37932b22c97851ae7b71c7515f32e923ac9e94d337c39333abddbc979d4fcce2?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_19072016.pcap.gz",
             "Hash": "ee1ef763460f073bbc845c245d08288f",
             "Link": "https://www.malware-traffic-analysis.net/2016/07/19/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Odin_27092016.pcap.gz",
             "Hash": "01f7db952b1b17d0a090b09018896105",
             "Link": "https://www.malware-traffic-analysis.net/2016/09/27/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_26022016.pcap.gz",
             "Hash": "3f118d0b888430ab9f58fc2589207988",
             "Link": "https://www.hybrid-analysis.com/sample/f927efd7cd2da3a052d857632f78ccf04b673e2774f6ce9a075e654dfd77d940?environmentId=1",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_29082016.pcap.gz",
             "Hash": "252e5d964f8b69ea6911fb4c38e36906",
             "Link": "https://www.malware-traffic-analysis.net/2016/08/29/index4.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_27042016.pcap.gz",
             "Hash": "e3e30cac025947224b302a41e9ca8a40",
             "Link": "https://www.malware-traffic-analysis.net/2016/04/27/index2.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_23042016.pcap.gz",
             "Hash": "fb6ca1cd232151d667f6cd2484fee8c8",
             "Link": "https://www.hybrid-analysis.com/sample/17c3d74e3c0645edb4b5145335b342d2929c92dff856cca1a5e79fa5d935fec2?environmentId=4",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Locky"
         },
         {
             "SamplePcap": "samplesPcap_compress/Locky_22092016.pcap.gz",
             "Hash": "4a03a16b548fe94d487ca15c9e21f87f",
             "Link": "https://www.malware-traffic-analysis.net/2016/09/22/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Locky"
         }
     ],
     "Sage": [
@@ -248,13 +287,15 @@
             "SamplePcap": "samplesPcap_compress/Sage_23012018.pcap.gz",
             "Hash": "0bfd22cccdbf9f024feb1c1fd44e961f",
             "Link": "https://www.hybrid-analysis.com/sample/136246bed689bff7ab26d7174ffd925d53e4bf831c662282f176d24c099e888a?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Sage"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sage_10052018.pcap.gz",
             "Hash": "05b7e80b215578e2c737549925daef10",
             "Link": "https://www.hybrid-analysis.com/sample/052b509cce1ce84abc2be8ac481e847470fc2cee8da98a2dd84a3b0bc85ca06f?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Sage"
         }
     ],
     "CryptoShield": [
@@ -262,13 +303,15 @@
             "SamplePcap": "samplesPcap_compress/CryptoShield_28022017.pcap.gz",
             "Hash": "e4d7596676b884563d9af2eef3642b1f",
             "Link": "https://www.malware-traffic-analysis.net/2017/02/28/index.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "CryptoShield"
         },
         {
             "SamplePcap": "samplesPcap_compress/CryptoShield_31012017.pcap.gz",
             "Hash": "cc882e0f288b8996bfa66cda9a27e137",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/31/index2.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "CryptoShield"
         }
     ],
     "WannaCry": [
@@ -276,25 +319,29 @@
             "SamplePcap": "samplesPcap_compress/wannaCry_16052017.pcap.gz",
             "Hash": "84c82835a5d21bbcf75a61706d8ab549",
             "Link": "https://www.hybrid-analysis.com/sample/ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa/?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "WannaCry"
         },
         {
             "SamplePcap": "samplesPcap_compress/wannaCry_15052017.pcap.gz",
             "Hash": "db349b97c37d22f5ea1d1841e3c89eb4",
             "Link": "https://www.hybrid-analysis.com/sample/24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "WannaCry"
         },
         {
             "SamplePcap": "samplesPcap_compress/wannaCry_24062021.pcap.gz",
             "Hash": "8ca0780db84fa71fee7a6a3dec66fd57",
             "Link": "https://www.hybrid-analysis.com/sample/db28ec41adb0407d75fd2e95cfbfee2ab8053700a78933e5091b7bc1741feea4/60d5093b2d4c1d35fb5d889d",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "WannaCry"
         },
         {
             "SamplePcap": "samplesPcap_compress/wannaCry_09082021.pcap.gz",
             "Hash": "4677ad996f48b802b2ef1e9b64901504",
             "Link": "https://www.hybrid-analysis.com/sample/f02bf0ee736e9fee8372772e207c5ec83af23e0521f5e0346e15ea584b4e8e36/61110be792205d251b579aec",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "WannaCry"
         }
     ],
     "GlobeImposter": [
@@ -302,7 +349,8 @@
             "SamplePcap": "samplesPcap_compress/GlobeImposter_06052017.pcap.gz",
             "Hash": "64ae280f3842a83d4ed3ac35bd51c391",
             "Link": "https://www.hybrid-analysis.com/sample/0edc1cf02ce8889de673d15d3809e6fab7f8e43838bea6a6ec524f493f00ce1e?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "GlobeImposter"
         }
     ],
     "Spora": [
@@ -310,7 +358,8 @@
             "SamplePcap": "samplesPcap_compress/Spora_17052017.pcap.gz",
             "Hash": "685c6834f8f81948822762cd13a48604",
             "Link": "https://www.malware-traffic-analysis.net/2017/05/17/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Spora"
         }
     ],
     "CryptoFortress": [
@@ -318,7 +367,8 @@
             "SamplePcap": "samplesPcap_compress/CryptoFortress_12032015.pcap.gz",
             "Hash": "e6dda3e06fd32fc3670d13098f3e22c9",
             "Link": "https://www.hybrid-analysis.com/sample/2b1f36a4c856b989a941f454fcce3a5e9670b21de105c5014450cbdaa27ed1cb?environmentId=4",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptoFortress"
         }
     ],
     "GandCrab": [
@@ -326,13 +376,15 @@
             "SamplePcap": "samplesPcap_compress/GandCrab_14042018.pcap.gz",
             "Hash": "bb82802f392e47caaeb67a6a7ff36313",
             "Link": "https://www.malware-traffic-analysis.net/2018/04/14/index.html",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "GandCrab"
         },
         {
             "SamplePcap": "samplesPcap_compress/GandCrab_22052019.pcap.gz",
             "Hash": "538d23ef01426d1157fa1137471a5cf7",
             "Link": "https://www.malware-traffic-analysis.net/2019/05/22/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "GandCrab"
         }
     ],
     "CryptoMix": [
@@ -340,25 +392,29 @@
             "SamplePcap": "samplesPcap_compress/CryptoMix_28112016.pcap.gz",
             "Hash": "8c413e31f39a54abf78c3585444051f7",
             "Link": "https://www.malware-traffic-analysis.net/2016/11/28/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptoMix"
         },
         {
             "SamplePcap": "samplesPcap_compress/CryptoMix_13012017.pcap.gz",
             "Hash": "f48ca69b0c2cdbe69dcfd4b73ae497c4",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/13/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptoMix"
         },
         {
             "SamplePcap": "samplesPcap_compress/CryptoMix_12122016.pcap.gz",
             "Hash": "c2f30cd537c79b6bcd292e6824ea874e",
             "Link": "https://www.malware-traffic-analysis.net/2016/12/12/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptoMix"
         },
         {
             "SamplePcap": "samplesPcap_compress/CryptoMix_24012017.pcap.gz",
             "Hash": "67ebcd5c61905474441aeaadfe9575bb",
             "Link": "https://www.malware-traffic-analysis.net/2017/01/24/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptoMix"
         }
     ],
     "CrypMIC": [
@@ -366,7 +422,8 @@
             "SamplePcap": "samplesPcap_compress/CrypMIC_30092016.pcap.gz",
             "Hash": "370546a376345688e5ad3ef836e2ea78",
             "Link": "https://www.malware-traffic-analysis.net/2016/09/30/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CrypMIC"
         }
     ],
     "Jaff": [
@@ -374,13 +431,15 @@
             "SamplePcap": "samplesPcap_compress/Jaff_06062017.pcap.gz",
             "Hash": "5ca3d8cf1cde038e762b535ec4e905fe",
             "Link": "https://www.malware-traffic-analysis.net/2017/06/06/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Jaff"
         },
         {
             "SamplePcap": "samplesPcap_compress/Jaff_13062017.pcap.gz",
             "Hash": "2611ef63084b219fb844528dee7c74c6",
             "Link": "https://www.malware-traffic-analysis.net/2017/06/13/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Jaff"
         }
     ],
     "Virlock": [
@@ -388,19 +447,22 @@
             "SamplePcap": "samplesPcap_compress/Virlock_17072016.pcap.gz",
             "Hash": "edc0fd0edb8fcdb161aae9d4eef9976a",
             "Link": "https://www.hybrid-analysis.com/sample/d78dbfa4fef22b024abd42c6ff50090b04be8e8c70a353a3a06ad6185d11637d?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Virlock"
         },
         {
             "SamplePcap": "samplesPcap_compress/Virlock_16022017.pcap.gz",
             "Hash": "a8f734b1eb48fb15ac70b26fa802a485",
             "Link": "https://www.hybrid-analysis.com/sample/5008d6522bd0ccf73ae97ca8120dedddd755b8a5190bd6d929da793debe7ec75?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Virlock"
         },
         {
             "SamplePcap": "samplesPcap_compress/Virlock_01082017.pcap.gz",
             "Hash": "b1b4e2217285431ecb5979a47e150d22",
             "Link": "https://www.hybrid-analysis.com/sample/7db4763240f3739d34b6eab7742ae838aeac2a0fb9f0891e8811436e6b69fadf?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Virlock"
         }
     ],
     "Aleta": [
@@ -408,7 +470,8 @@
             "SamplePcap": "samplesPcap_compress/Aleta_29072017.pcap.gz",
             "Hash": "dc6f8298261ac0e16e6aa65f3e53b4d6",
             "Link": "https://www.malware-traffic-analysis.net/2017/07/29/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Aleta"
         }
     ],
     "Ryuk": [
@@ -416,13 +479,15 @@
             "SamplePcap": "samplesPcap_compress/Ryuk_16042019.pcap.gz",
             "Hash": "31bd0f224e7e74eee2847f43aae23974",
             "Link": "https://www.hybrid-analysis.com/sample/f130530949c0e3adca48ba558980b634c0a78c8faa5572718b665cc7abfd7703/?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Ryuk"
         },
         {
             "SamplePcap": "samplesPcap_compress/Ryuk_10012021.pcap.gz",
             "Hash": "8555b213260ba5eda4bf37652cecb431",
             "Link": "https://www.hybrid-analysis.com/sample/781bc4dcbd459893397a8b987bf697f5b95435dfaf7fe3f4d2224728e7a2202a/5ffb90ccb9847d25941e91bf",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Ryuk"
         }
     ],
     "Revenge": [
@@ -430,7 +495,8 @@
             "SamplePcap": "samplesPcap_compress/revenge_15032018.pcap.gz",
             "Hash": "44cbd69325abe190bbe850653494c422",
             "Link": "https://www.hybrid-analysis.com/sample/07e683250373e88b5e1522db19e9f04a586cb71454e13ab7bda7c89630ae3a3e?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Revenge"
         }
     ],
     "Maktub": [
@@ -438,7 +504,8 @@
             "SamplePcap": "samplesPcap_compress/maktub_12042018.pcap.gz",
             "Hash": "a09953399ffea70b37322642e52b3d28",
             "Link": "https://www.hybrid-analysis.com/sample/e4e9e8bb028a3774607c6799fb126153f7a5a6f73e5101864d93f0808e392d9c?environmentId=120",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Maktub"
         }
     ],
     "Mole": [
@@ -446,7 +513,8 @@
             "SamplePcap": "samplesPcap_compress/Mole_26052018.pcap.gz",
             "Hash": "6657d1452ebe682a01a49b6e4a711bea",
             "Link": "https://www.hybrid-analysis.com/sample/9e32f6654a122fbceef5d1b0bd6d781fb364b74aedce94fea8e7969836bcf4f7?environmentId=100",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "Mole"
         }
     ],
     "Bart": [
@@ -454,7 +522,8 @@
             "SamplePcap": "samplesPcap_compress/bart_01092016.pcap.gz",
             "Hash": "4741852c23364619257c705aca9b1be3",
             "Link": "https://www.malware-traffic-analysis.net/2016/09/01/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Bart"
         }
     ],
     "MRCR": [
@@ -462,7 +531,8 @@
             "SamplePcap": "samplesPcap_compress/MRCR_15012017.pcap.gz",
             "Hash": "148150db1170b5698243c8b018071843",
             "Link": "https://www.hybrid-analysis.com/sample/61091d583492a0d0f0d027a9bc13b054fbf5ba0b997c3dc82b9b18da6c551765?environmentId=120",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "MRCR"
         }
     ],
     "CryptFile2": [
@@ -470,7 +540,8 @@
             "SamplePcap": "samplesPcap_compress/CryptFile2_10112016.pcap.gz",
             "Hash": "f27519b964ba21ca09a4fe64917cc375",
             "Link": "https://www.malware-traffic-analysis.net/2016/11/10/index3.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryptFile2"
         }
     ],
     "DMALocker": [
@@ -478,7 +549,8 @@
             "SamplePcap": "samplesPcap_compress/DMALocker_01022016.pcap.gz",
             "Hash": "6fbd3cdcafd6695c384a1119873786aa",
             "Link": "https://www.hybrid-analysis.com/sample/db1696106bb100a1fc10fadc9b93e17f80055604fa53fe3785b64efdabe0a254?environmentId=4",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "DMALocker"
         }
     ],
     "Eris": [
@@ -486,7 +558,8 @@
             "SamplePcap": "samplesPcap_compress/Eris_02082019.pcap.gz",
             "Hash": "a4eeec442799c56c3e1aa9761661fb42",
             "Link": "https://www.malware-traffic-analysis.net/2019/08/02/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Eris"
         }
     ],
     "STOP": [
@@ -494,13 +567,15 @@
             "SamplePcap": "samplesPcap_compress/Stop_10022019.pcap.gz",
             "Hash": "febce80af00ffa5c1e6d9d3e1d5278ee",
             "Link": "https://www.hybrid-analysis.com/sample/23da0dda0b6eb3dd9854e4f78a58d6a9248118962119c106171461e60cf4f5cf?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "STOP"
         },
         {
             "SamplePcap": "samplesPcap_compress/Stop_01022020.pcap.gz",
             "Hash": "283bf952e656763a94626cac01d7bc85",
             "Link": "https://www.hybrid-analysis.com/sample/a4b51921f0a43dfc147a9c69f5ac5d6abb6420126a7ba54c97d119697f560ecc?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "STOP"
         }
     ],
     "BitPaymer": [
@@ -508,7 +583,8 @@
             "SamplePcap": "samplesPcap_compress/bitPaymer_30082017.pcap.gz",
             "Hash": "0a19dd8fdd632f175f0ff0488e4cd8f2",
             "Link": "https://www.hybrid-analysis.com/sample/1c0ffdaddec1eca9a9a5ef5192151dbce8ccd8e31a84c51d70f5a5c64f07a363?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "BitPaymer"
         }
     ],
     "TeslaCrypt": [
@@ -516,7 +592,8 @@
             "SamplePcap": "samplesPcap_compress/TeslaCrypt_28122015.pcap.gz",
             "Hash": "14c18ac91a84a129a2140c5833c298db",
             "Link": "https://www.hybrid-analysis.com/sample/f87a18bdc206718fdbe39fca64870066658bb1341558012197f5f337ec311da4?environmentId=1",
-            "Scenario": "original"
+            "Scenario": "original",
+            "Family": "TeslaCrypt"
         }
     ],
     "Phobos": [
@@ -524,7 +601,8 @@
             "SamplePcap": "samplesPcap_compress/Phobos_08052019.pcap.gz",
             "Hash": "62d3580c88222c59a276a2df8445758c",
             "Link": "https://www.hybrid-analysis.com/sample/3bbac55728d38c1bcaac6b6fece73fb7a66ac3a0a71093bcacd4577c351db989?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Phobos"
         }
     ],
     "Sodinokibi": [
@@ -532,37 +610,43 @@
             "SamplePcap": "samplesPcap_compress/Sodinokibi_19072019.pcap.gz",
             "Hash": "61c19e7ce627da9b5004371f867a47d3",
             "Link": "https://www.hybrid-analysis.com/sample/bf7114f025fff7dbc6b7aff8e4edb0dd8a7b53c3766429a3c5f10142609968f9?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sodinokibi_23032020.pcap.gz",
             "Hash": "61c19e7ce627da9b5004371f867a47d3",
             "Link": "https://www.hybrid-analysis.com/sample/6f4da4d2ffa8f6d304131abe904252b8525f41869995eda3a8053de5ba550b27?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sodinokibi_24032020.pcap.gz",
             "Hash": "5256618e96a84f077e60fd6ee39a4eca",
             "Link": "https://www.hybrid-analysis.com/sample/bde4045f53bfb7b933569664c1fad76e1f510099a8bb76d36e4139d55a2bd45d?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sodinokibi_23012021.pcap.gz",
             "Hash": "c4eeb2e764bae1439b6c4aa6b2606090",
             "Link": "https://www.hybrid-analysis.com/sample/1eb4df21d3ca977bbee0f7a87b5569235a517e3577d31a9e796c630796994864/600d58e5091bd148cc16623b",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sodinokibi_27042021.pcap.gz",
             "Hash": "cfff09d3936962f72fcee2a50e3fc2c4",
             "Link": "https://www.hybrid-analysis.com/sample/54f07b825fd662618e1142ee47ef5c988c08ae59c60209bef250fc68bfd3826c/60877114083c8d0f5d131944",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         },
         {
             "SamplePcap": "samplesPcap_compress/Sodinokibi_04052021.pcap.gz",
             "Hash": "cfff09d3936962f72fcee2a50e3fc2c4",
             "Link": "https://www.hybrid-analysis.com/sample/939f58c10211a768f664a8f54310dcc42eb672887be61d5d377b5a88be107b9d/609150bb2c3d501170673fcd",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Sodinokibi"
         }
     ],
     "Maze": [
@@ -570,7 +654,8 @@
             "SamplePcap": "samplesPcap_compress/Maze_19122019.pcap.gz",
             "Hash": "e69a8eb94f65480980deaf1ff5a431a6",
             "Link": "https://www.hybrid-analysis.com/sample/fc611f9d09f645f31c4a77a27b6e6b1aec74db916d0712bef5bce052d12c971f?environmentId=100",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Maze"
         }
     ],
     "Scarab": [
@@ -578,7 +663,8 @@
             "SamplePcap": "samplesPcap_compress/Scarab_18102019.pcap.gz",
             "Hash": "33ff49640f83e5a33fd5e61c5cec6f47",
             "Link": "https://www.hybrid-analysis.com/sample/d750099606fe799902b7e5cf28f25446e85090510ea3e4a05793cb379f8e9621/5da94bfa217d93849fe67d6e",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Scarab"
         }
     ],
     "RansomX": [
@@ -586,7 +672,8 @@
             "SamplePcap": "samplesPcap_compress/RansomX_28062020.pcap.gz",
             "Hash": "fcd21c6fca3b9378961aa1865bee7ecb",
             "Link": "https://www.hybrid-analysis.com/sample/4cae449450c07b7aa74314173c7b00d409eabfe22b86859f3b3acedd66010458/5ef8c94e41a80103a733e72e",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "RansomX"
         }
     ],
     "Shade": [
@@ -594,25 +681,29 @@
             "SamplePcap": "samplesPcap_compress/Shade_15112019.pcap.gz",
             "Hash": "42405f6b31fd7fb68d3ea38c0ac46885",
             "Link": "https://www.hybrid-analysis.com/sample/9b640e6f761770712c369f9fd636a0f1c031b48204958caec5971f9a2bbe39e7/5dcbb201038838d71ba7cd44",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Shade"
         },
         {
             "SamplePcap": "samplesPcap_compress/Shade_24072021.pcap",
             "Hash": "a9f7fbb9c23ba12420612c9f2ed5b813",
             "Link": "https://www.hybrid-analysis.com/sample/9edd17e6a6d95ae848f9e77a605bc5e88f2a200ce1be66c83cf071f06c14b31c/610670a71df86c684a59489c",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Shade"
         },
         {
             "SamplePcap": "samplesPcap_compress/Shade_16092021.pcap",
             "Hash": "7de11b4433592c186def66e5cf7a49d6",
             "Link": "https://www.hybrid-analysis.com/sample/e10e13eee3a5bc9ec3d66ac44ebbda21d901be345f01d393f3d4dad26dde1afa/614352f0d3153459c56be8bd",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Shade"
         },
         {
             "SamplePcap": "samplesPcap_compress/Shade_15092021.pcap",
             "Hash": "56f0757d01c87b17d0160bda0b46418e",
             "Link": "https://www.hybrid-analysis.com/sample/dc7f4049d7b307f7505cfd0e46dc517c5933c3fd05db77b81520609002991c28/614207044fcab91a9e48d15b",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Shade"
         }
     ],
     "Razi": [
@@ -620,7 +711,8 @@
             "SamplePcap": "samplesPcap_compress/Razi_15012021.pcap.gz",
             "Hash": "e25e078255b56b47897ac96a7842de92",
             "Link": "https://www.hybrid-analysis.com/sample/1b9412ca5e9deb29aeaa37be05ae8d0a8a636c12fdff8c17032aa017f6075c02/60014663afa20b6961295e5f",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Razi"
         }
     ],
     "CryLock": [
@@ -628,7 +720,8 @@
             "SamplePcap": "samplesPcap_compress/CryLock_24012021.pcap.gz",
             "Hash": "b961eb350e94cead67efae131b3fff4c",
             "Link": "https://www.hybrid-analysis.com/sample/79a3ed67bbd02fdc01c1d3b11d343cf93217c9d85d6ca9dd4d275114a97435ea/600d37770bbe1c47914c931d",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "CryLock"
         }
     ],
     "Netwalker": [
@@ -636,7 +729,8 @@
             "SamplePcap": "samplesPcap_compress/netwalker_21012021.pcap.gz",
             "Hash": "3229e2489dde524195cf0ccbbf5f7d40",
             "Link": "https://www.hybrid-analysis.com/sample/488261e1e0793e6830f68c572db7e229af1d9403bbc8e61b9da707b1b63a137d/6009fdfc258f0177cd739c6e",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Netwalker"
         }
     ],
     "Hive": [
@@ -644,7 +738,8 @@
             "SamplePcap": "samplesPcap_compress/Hive_06082021.pcap",
             "Hash": "c3aceb1e2eb3a6a3ec54e32ee620721e",
             "Link": "https://www.hybrid-analysis.com/sample/77a398c870ad4904d06d455c9249e7864ac92dda877e288e5718b3c8d9fc6618/610cf4bce2a4dd42e7494966",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Hive"
         }
     ]
 }

@@ -6,14 +6,15 @@ from bs4 import BeautifulSoup
 import queue
 
 class Downloader(Thread):
-    def __init__(self, request_queue, num_worker):
+    def __init__(self, request_queue):
         Thread.__init__(self)
         self.queue = request_queue
         #self.results = []
         self.LOG_FAIL = "\tDownload failed"
         self.LOG_SUCCESS = "\tDownload successfully"
         self.LOG_NOTEXIST = "\tFile non exist"
-        self.num_worker = num_worker
+        self.DS_BASE_PCAP = "/Volumes/Archivio/malware"
+
 
     def __mta_download(self, url, dest, log_file):
         if not dest[-1] == '/':
@@ -96,16 +97,15 @@ class Downloader(Thread):
             if sample == "":
                 break
 
+            path = f"{self.DS_BASE_PCAP}/{sample['Family']}/{sample['Hash']}/"
+
             if "malware-traffic-analysis.net" in sample["Link"]:
                 with open('download.log', 'a') as log:
-                    self.__mta_download(sample["Link"], 'raw/pcap/test/', log)
+                    self.__mta_download(sample["Link"], path, log)
             elif "hybrid-analysis.com" in sample["Link"]:
                 with open('download.log', 'a') as log:
-                    self.__ha_download(sample["SamplePcap"], sample["Scenario"], 'raw/pcap/test/', log)
+                    self.__ha_download(sample["SamplePcap"], sample["Scenario"], path, log)
 
-            #request = urllib.request.Request(content)
-            #response = urllib.request.urlopen(request)
-            #self.results.append(response.read())
             self.queue.task_done()
 
 #------------------------------------------------------------
@@ -114,19 +114,22 @@ elems = [{
             "SamplePcap": "samplesPcap_compress/cerber_03102016.pcap.gz",
             "Hash": "b17ff50e5abca3e850a433af42107314",
             "Link": "https://www.malware-traffic-analysis.net/2016/10/03/index2.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Cerber"
         },
         {
             "SamplePcap": "samplesPcap_compress/Crysis_17092018.pcap.gz",
             "Hash": "e9d396504c415eb746396ec310eacd1f",
             "Link": "https://www.hybrid-analysis.com/sample/05fd72a70e0604da8e888b1ecbab2e3ca77fe079a2abe06157769e30e22dedcd?environmentId=120",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Spora_17052017.pcap.gz",
             "Hash": "685c6834f8f81948822762cd13a48604",
             "Link": "https://www.malware-traffic-analysis.net/2017/05/17/index.html",
-            "Scenario": "NAT"
+            "Scenario": "NAT",
+            "Family": "Spora"
         }
         ]
 samples = queue.Queue()
@@ -142,7 +145,7 @@ for w in range(NO_WORKER):
 # Create workers and add tot the queue
 workers = []
 for _ in range(NO_WORKER):
-    worker = Downloader(samples, NO_WORKER)
+    worker = Downloader(samples)
     worker.start()
     workers.append(worker)
 # Join workers to wait till they finished
