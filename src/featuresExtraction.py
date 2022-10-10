@@ -5,7 +5,7 @@ from zipfile import ZipFile
 import shutil
 import gzip as gz
 
-# path ARCHIVIO
+#path ARCHIVIO
 ARCHIVE_PATH_GOODWARE = "/Volumes/ARCHIVIO/goodware"
 ARCHIVE_PATH_MALWARE = "/Volumes/ARCHIVIO/malware"
 ARCHIVE_DEST_PATH = "/Volumes/ARCHIVIO/csv"
@@ -25,8 +25,9 @@ def feature_extract(path, traffic_type):
             os.system(cmd)
             os.remove(f"{path}/{file}")
         elif file.endswith(".pcap"):
-            #cmd = f"cicflowmeter -f {path}/{file} -c {ARCHIVE_DEST_PATH}/{traffic_type}/{file.replace('.pcap', '.csv')}"
-            cmd = f"cicflowmeter -f ../prova/{file} -c ../prova/{traffic_type}/{file.replace('.pcap', '.csv')}"
+            cmd = f"cicflowmeter -f {path}/{file} -c {ARCHIVE_DEST_PATH}/{traffic_type}/{file.replace('.pcap', '.csv')}"
+            #COMANDO TEST
+            #cmd = f"cicflowmeter -f ../prova/{file} -c ../prova/{traffic_type}/{file.replace('.pcap', '.csv')}"
             status_code = os.system(cmd)
 
             logger.log_writer(f"{path}/{file}", status_code)
@@ -40,27 +41,30 @@ def unzip_pcap(path, type, pswd = None):
         with ZipFile(path, 'r') as obj_zip:
             for file in obj_zip.namelist():
                 if file.endswith('.pcap'): #necessaria perchè ci sono certi archivi che contengono alti file inerenti al ransonware oltre al pcap, che è ciò che mi interessa
-                    obj_zip.extract(file, f'{dest_dir}/', pwd = bytes(pswd, 'utf-8'))
+                    obj_zip.extract(file, dest_dir, pwd = bytes(pswd, 'utf-8'))
     elif type == 'gz':
         dest_name = splitted_path[-1]
 
         with gz.open(path, 'rb') as f_in:
             with open(f'{dest_dir}/{dest_name[: len(dest_name) - 3]}', 'wb') as f_out:
-               shutil.copyfileobj(f_in, f_out)
-
+                try:
+                    shutil.copyfileobj(f_in, f_out)
+                except EOFError:
+                    print("Qualcosa è andato storto")
 def main():
-    #feature_extract(ARCHIVE_PATH_GOODWARE, 'goodware')
-    #feature_extract(ARCHIVE_PATH_MALWARE, 'malware')
-    # TODO: rivedere path
-    for archive in os.listdir('../prova'):
-        if not archive == ".DS_Store":
-            print(f"Decompressione {archive}...")
-            if archive.endswith('zip'):
-                unzip_pcap(f'../prova/{archive}', pswd='infected', type='zip')
-            elif archive.endswith('gz'):
-                unzip_pcap(f'../prova/{archive}', type='gz')
+    feature_extract(ARCHIVE_PATH_GOODWARE, 'goodware')
 
-    feature_extract("../prova", 'malware')
+    for subdir in os.listdir(ARCHIVE_PATH_MALWARE):
+        for subsubdir in os.listdir(f"{ARCHIVE_PATH_MALWARE}/{subdir}"):
+            for archive in os.listdir(f"{ARCHIVE_PATH_MALWARE}/{subdir}/{subsubdir}"):
+                print(f"Decompressione {ARCHIVE_PATH_MALWARE}/{subdir}/{subsubdir}/{archive}...")
+
+                if archive.endswith('.zip'):
+                    unzip_pcap(f'{ARCHIVE_PATH_MALWARE}/{subdir}/{subsubdir}/{archive}', pswd='infected', type='zip')
+                elif archive.endswith('.gz'):
+                    unzip_pcap(f'{ARCHIVE_PATH_MALWARE}/{subdir}/{subsubdir}/{archive}', type='gz')
+    feature_extract(ARCHIVE_PATH_MALWARE, 'malware')
+    #feature_extract("../prova", 'malware') #esecuzione di test
 
 
 if __name__ == "__main__":
