@@ -12,7 +12,6 @@ class Downloader(Thread):
         #self.results = []
         self.LOG_FAIL = "\tDownload failed"
         self.LOG_SUCCESS = "\tDownload successfully"
-        self.LOG_NOTEXIST = "\tFile non exist"
         self.DS_BASE_PCAP = "/Volumes/Archivio/malware"
 
 
@@ -31,18 +30,24 @@ class Downloader(Thread):
         # download pcapFile
         url_splited = url.split('/')
         pcap_url = '/'.join(url_splited[: len(url_splited) - 1]) + f'/{name}'
-        res = req.get(pcap_url)
+        dest_path = f'{dest + name}'
 
-        print(pcap_url)
-        log_file.write(f'{datetime.datetime.now()} {pcap_url}\n')
-        if res.status_code == 200:
-            print(self.LOG_SUCCESS)
-            log_file.write(f'{self.LOG_SUCCESS}\n')
-            with open(f'{dest + name}', 'wb') as pcap:
-                pcap.write(res.content)
+        if not os.path.isfile(dest_path) or not os.path.exists(dest_path):
+            res = req.get(pcap_url)
+
+            print(pcap_url)
+            log_file.write(f'{datetime.datetime.now()} {pcap_url}\n')
+
+            if res.status_code == 200:
+                print(self.LOG_SUCCESS)
+                log_file.write(f'{self.LOG_SUCCESS}\n')
+                with open(dest_path, 'wb') as pcap:
+                    pcap.write(res.content)
+            else:
+                print(self.LOG_FAIL)
+                log_file.write(f'{self.LOG_FAIL}\n')
         else:
-            print(self.LOG_FAIL)
-            log_file.write(f'{self.LOG_FAIL}\n')
+            print(f"{dest_path} - FILE GIÀ ESISTENTE")
 
     def __build_sample_attr(self, sample_name, scenario):
         if scenario == "original":
@@ -70,25 +75,28 @@ class Downloader(Thread):
         post_res = req.post(url1, data=payload, headers=header)
 
         if post_res.status_code == 200:
-            post_res = post_res.json()['name'][12:]
+            if len(os.listdir(dest)) == 0:
+                post_res = post_res.json()['name'][12:]
 
-            get_res = req.get(f'{url2 + post_res}')
+                get_res = req.get(f'{url2 + post_res}')
 
-            print(url2 + post_res)
-            log_file.write(f'{datetime.datetime.now()} {url2 + post_res}\n')
-            log_file.write(f'\tsample={sample_value}\n')
+                print(url2 + post_res)
+                log_file.write(f'{datetime.datetime.now()} {url2 + post_res}\n')
+                log_file.write(f'\tsample={sample_value}\n')
 
-            if get_res.status_code == 200:
-                print(self.LOG_SUCCESS)
-                log_file.write(f'{self.LOG_SUCCESS}\n')
-                with open(f'{dest + post_res}', 'wb') as pcap:
-                    pcap.write(get_res.content)
+                if get_res.status_code == 200:
+                    print(self.LOG_SUCCESS)
+                    log_file.write(f'{self.LOG_SUCCESS}\n')
+                    with open(f'{dest + post_res}', 'wb') as pcap:
+                        pcap.write(get_res.content)
+                else:
+                    print(self.LOG_FAIL)
+                    log_file.write(f'{self.LOG_FAIL}\n')
             else:
-                print(self.LOG_FAIL)
-                log_file.write(f'{self.LOG_FAIL}\n')
+                print('File già esistente')
         else:
             print(self.LOG_NOTEXIST)
-            log_file.write(f'{self.LOG_FAIL}\n')
+            log_file.write(f'{self.LOG_NOTEXIST}\n')
 
     def run(self):
         while True:
@@ -97,7 +105,8 @@ class Downloader(Thread):
             if sample == "":
                 break
 
-            path = f"{self.DS_BASE_PCAP}/{sample['Family']}/{sample['Hash']}/"
+            #path = f"raw/pcpa/{sample['Hash']}"
+            path = f"{self.DS_BASE_PCAP}/{sample['Family']}/{sample['Hash']}"
 
             if "malware-traffic-analysis.net" in sample["Link"]:
                 with open('download.log', 'a') as log:
@@ -109,6 +118,7 @@ class Downloader(Thread):
             self.queue.task_done()
 
 #------------------------------------------------------------
+'''
 
 elems = [{
             "SamplePcap": "samplesPcap_compress/cerber_03102016.pcap.gz",
@@ -116,13 +126,6 @@ elems = [{
             "Link": "https://www.malware-traffic-analysis.net/2016/10/03/index2.html",
             "Scenario": "NAT",
             "Family": "Cerber"
-        },
-        {
-            "SamplePcap": "samplesPcap_compress/Crysis_17092018.pcap.gz",
-            "Hash": "e9d396504c415eb746396ec310eacd1f",
-            "Link": "https://www.hybrid-analysis.com/sample/05fd72a70e0604da8e888b1ecbab2e3ca77fe079a2abe06157769e30e22dedcd?environmentId=120",
-            "Scenario": "NAT",
-            "Family": "Crysis"
         },
         {
             "SamplePcap": "samplesPcap_compress/Spora_17052017.pcap.gz",
@@ -150,4 +153,5 @@ for _ in range(NO_WORKER):
     workers.append(worker)
 # Join workers to wait till they finished
 for worker in workers:
-    worker.join()
+    worker.join() 
+'''
