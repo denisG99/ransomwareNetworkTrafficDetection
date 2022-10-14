@@ -49,7 +49,7 @@ def IP_to_integer(data):
 
     return ips
 
-CSV_PATH = "../dataset/raw/csv/"
+CSV_PATH = "../dataset_download/raw/csv/"
 
 for d in os.listdir(CSV_PATH):
     for csv in os.listdir(f"{CSV_PATH + d}"):
@@ -67,4 +67,4 @@ for d in os.listdir(CSV_PATH):
                                 "Length" : df['frame.len'].to_numpy(),
                                 "Duration" : set_duration(df)})
 
-        cleaData.to_csv(f'../dataset/data/{d}_{csv.replace(".csv", "")}.csv', index=False)
+        cleaData.to_csv(f'../dataset_download/data/{d}_{csv.replace(".csv", "")}.csv', index=False)
