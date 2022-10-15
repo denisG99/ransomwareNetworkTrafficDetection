@@ -8,7 +8,7 @@ import pandas as pd
 import os
 import math
 
-CSV_PATH = "../dataset_download/data/"
+CSV_PATH = "../capture_download/data/"
 
 def get_connections(data):
     connections = list()
@@ -76,4 +76,4 @@ for csv in os.listdir(CSV_PATH):
                                   "dst2srcPcks": dst2srcPcks,
                                   "dst2srcBytes": dst2srcBytes})
 
-    aggregateData.to_csv(f'../dataset_download/connection/{csv}', index=False)
+    aggregateData.to_csv(f'../capture_download/connection/{csv}', index=False)

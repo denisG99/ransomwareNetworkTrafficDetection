@@ -1,5 +1,5 @@
 '''
-bozza algoritmo random forest: esempio classificatore RF su dataset_download iris
+bozza algoritmo random forest: esempio classificatore RF su capture_download iris
 '''
 import pandas as pd
 import numpy as np
@@ -11,10 +11,10 @@ from sklearn.metrics import precision_score
 from sklearn.preprocessing import StandardScaler #normalizzazione dei dati
 from sklearn.datasets import load_iris
 
-#1. Import del dataset_download
+#1. Import del capture_download
 iris = load_iris()
 
-#2. Divido dataset_download in train e test set
+#2. Divido capture_download in train e test set
 iris_data, iris_label = iris['data'], iris['target']
 
 X_train, X_test, Y_train, Y_test = train_test_split(iris_data, iris_label, test_size=0.3, train_size=0.7)
