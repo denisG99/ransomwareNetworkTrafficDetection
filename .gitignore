@@ -1,7 +1,7 @@
-/dataset_download/download.log
-/dataset_download/ransom.json
-/dataset_download/ransom_restructured.json
-/dataset_download/raw/
+/capture_download/download.log
+/capture_download/ransom.json
+/capture_download/ransom_restructured.json
+/capture_download/raw/
 /prova/
 /src/extraction.log
 /src/prova.csv
