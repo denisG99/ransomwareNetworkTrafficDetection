@@ -1,6 +1,9 @@
-/dataset/download.log
-/dataset/ransom.json
-/dataset/ransom_restructured.json
-/dataset/raw/
+/capture_download/download.log
+/capture_download/ransom.json
+/capture_download/ransom_restructured.json
+/capture_download/raw/
 /prova/
 /src/extraction.log
+/src/prova.csv
+/src/.ipynb_checkpoints/
+/csv/

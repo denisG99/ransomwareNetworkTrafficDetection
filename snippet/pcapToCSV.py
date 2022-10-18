@@ -6,7 +6,7 @@ L'header CSV ha il seguente formato:
 
 import os
 
-RAWDATA_PATH = "../dataset/raw/" #percorso in cui posso trovare i pcap da convertire
+RAWDATA_PATH = "../capture_download/raw/"  #percorso in cui posso trovare i pcap da convertire
 
 def pcap_to_csv(path, dest_path, lst_filter):
     #TODO: vedere se c'è un modo per estrarre tabella delle comunicazioni (statistica wireshark)
