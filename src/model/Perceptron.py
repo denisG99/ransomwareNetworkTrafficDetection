@@ -5,8 +5,8 @@ import numpy as np
 
 @dataclass
 class Perceptron:
+    #fields
     __neuron : Neuron = field(default_factory=Neuron, init=False)
-    #__inputs: np.ndarray = field(init=False)
     __num_features: int
     __weights: np.ndarray = field(init=False)
     __learning_rate : float = 0.1
@@ -19,13 +19,13 @@ class Perceptron:
         if not 0 <= self.__learning_rate <= 1:
             self.__learning_rate = 0.1
 
-    def get_weigths(self):
+    def get_weigths(self) -> np.ndarray:
         return self.__weights
 
-    def get_bias(self):
+    def get_bias(self) -> float:
         return self.__bias
 
-    def fit(self, X, y, epochs):
+    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int) -> None:
         y_ = np.array([1 if i > 0 else 0 for i in y])
 
         for _ in range(epochs):
@@ -41,12 +41,12 @@ class Perceptron:
                 self.__weights += update * x_i
                 self.__bias += update
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> int:
         linear_output = self.__neuron.weighted_sum(self.__weights, self.__bias, X)
 
         return self.__neuron.af(linear_output)
 
-    def evaluate(self, X, y):
+    def evaluate(self, X: np.ndarray, y: np.ndarray) -> float:
         predictions = self.predict(X)
 
         accuracy = np.sum(y == predictions) / len(predictions)
@@ -56,7 +56,6 @@ class Perceptron:
 
 def main() -> None:
     import pandas as pd
-    import matplotlib.pyplot as plt
 
     #dataset preparation
     toy = pd.read_csv("toydata.csv").to_numpy()

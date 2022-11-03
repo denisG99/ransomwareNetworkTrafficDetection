@@ -1,5 +1,5 @@
 """""
- * This class is an enumeration that decribe the node type.
+ * This is an enumeration that decribe the node type.
  
  * The node types are: DECISION, LEAF or SPLIT.
 """""
