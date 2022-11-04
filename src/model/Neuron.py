@@ -5,9 +5,10 @@ import numpy as np
 @dataclass(frozen=True)
 class Neuron:
     #TODO: realizzare dizionario contenente varie funzioni d'attivazione per fornirli maggior flessibilità
+
     #activation function
-    def af(self, x: float) -> int:
-        return np.where(x >= 0, 1, 0)
+    def af(self, x: float) -> float: #TODO: da cambiare
+        return 1/(1 + np.exp(-x))
 
     #weighted sum
     def weighted_sum(self, weights:np.ndarray, bias: float, x:np.ndarray) -> float:
@@ -15,7 +16,7 @@ class Neuron:
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-def main() -> int:
+def main() -> float:
     weights: np.ndarray[np.float] = np.ones(3)
     bias: float = 0
     x: np.ndarray[np.float] = np.ones(3)
