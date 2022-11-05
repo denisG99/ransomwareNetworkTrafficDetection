@@ -22,9 +22,19 @@ class NeuralNetwork:
         for perceptron in self.__perceptrons:
             perceptron.fit(X, y, epochs)
 
-            print('\nModel parameters:')
-            print(f'\tWeights: {perceptron.get_weigths()}')
-            print(f'\tBias: {perceptron.get_bias()}\n')
+            #print('\nModel parameters:')
+            #print(f'\tWeights: {perceptron.get_weigths()}')
+            #print(f'\tBias: {perceptron.get_bias()}\n')
+
+    def evaluate(self, X: np.ndarray, y: np.ndarray) -> None:
+        i: int = 0
+
+        for perceptron in self.__perceptrons:
+            print(f"\tPerceptron {i}")
+            i += 1
+            print(f'\t\t{perceptron.evaluate(X, y)}')
+
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
@@ -50,6 +60,12 @@ def main() -> None:
     nn = NeuralNetwork(2)
 
     nn.fit(X_train, y_train, 5)
+
+    print("Train accuracy:")
+    nn.evaluate(X_train, y_train)
+
+    print("Test accuracy:")
+    nn.evaluate(X_test, y_test)
 
 
 if __name__ == "__main__":
