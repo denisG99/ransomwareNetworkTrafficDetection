@@ -16,6 +16,7 @@ class Perceptron:
     __weights: np.ndarray = field(init=False)
     __learning_rate : float = 0.1
     __bias: float = 1.0
+    __threshold: float = 0.5
 
     def __post_init__(self):
         self.__weights, self.__bias = self.__init_weights()
@@ -64,14 +65,14 @@ class Perceptron:
         bias = float(RandomState().uniform(-sd, sd))
 
         return weigths, bias
-    """
-    def evaluate(self, X: np.ndarray, y: np.ndarray) -> float:
-        #predictions = self.predict(X)
 
-        #accuracy = np.sum(y == predictions) / len(predictions)
-        #return accuracy
-        return precision_score(y, self.predict(X), average='micro')
-    """
+    def evaluate(self, X: np.ndarray, y: np.ndarray) -> float:
+        predictions = self.predict(X)
+        predictions = np.where(predictions >= self.__threshold, 1, 0)
+
+        accuracy = np.sum(y == predictions) / len(predictions)
+        return accuracy
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
@@ -117,8 +118,8 @@ def main() -> None:
     print(f'\tWeights: {perceptron.get_weigths()}')
     print(f'\tBias: {perceptron.get_bias()}\n')
 
-    #print(f'Train accuracy: {perceptron.evaluate(X_train, y_train) * 100}')
-    #print(f'Test accuracy: {perceptron.evaluate(X_test, y_test) * 100}')
+    print(f'Train accuracy: {perceptron.evaluate(X_train, y_train) * 100}')
+    print(f'Test accuracy: {perceptron.evaluate(X_test, y_test) * 100}')
 
     #plotting decision boundaries
     w, b = perceptron.get_weigths(), perceptron.get_bias()
