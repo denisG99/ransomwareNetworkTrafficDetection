@@ -22,21 +22,28 @@ class NeuralNetwork:
         self.__perceptrons = np.empty(self.__num_perceptrons, dtype=Perceptron)
 
         for i in range(self.__num_perceptrons):
-            self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1)
+            self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1, early_stopping=True, n_iter_no_change=5, tol=1e-4)
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray) -> object:
         for perceptron in self.__perceptrons:
-            perceptron.fit(X, y)
+            model = perceptron.fit(X, y)
+
+            #print(model.coef_)
+            #print(model.intercept_)
+            #print(model.n_iter_)
+            #print(model.loss_function_)
+
             #print(f'\tMean Accuracy: {results.best_score_}')
             #print(f'\tConfig: {results.best_params_}')
 
             #print('\nModel parameters:')
             #print(f'\tWeights: {perceptron.get_weigths()}')
             #print(f'\tBias: {perceptron.get_bias()}\n')
+            return model
 
     def predict(self, X) -> float:
         for perceptron in self.__perceptrons:
-                output = perceptron.predict(X)
+            output = perceptron.predict(X)
 
         return output
 
@@ -71,7 +78,7 @@ def main() -> None:
 
     nn = NeuralNetwork(2)
 
-    nn.fit(X_train, y_train)
+    model = nn.fit(X_train, y_train)
 
     nn.evaluate(X_train, y_train, "Training accuracy")
     nn.evaluate(X_test, y_test, "Testing accuracy")
