@@ -7,7 +7,7 @@ class Neuron:
     #TODO: realizzare dizionario contenente varie funzioni d'attivazione per fornirli maggior flessibilità
 
     #activation function
-    def af(self, x: float) -> float: #TODO: da cambiare
+    def af(self, x: float) -> float:
         return 1/(1 + np.exp(-x))
 
     #weighted sum
