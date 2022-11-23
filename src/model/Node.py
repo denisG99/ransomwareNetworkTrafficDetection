@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Union, Dict, Any, Iterable
+
 from sklearn.model_selection import train_test_split
 from scipy.stats import entropy
 
@@ -8,12 +9,20 @@ from NodeType import NodeType
 from Classification import Classification
 
 import numpy as np
+import sklearn
 
 ENTROPY_TH: float = 0.1
 
 @dataclass
 class Node:
-    #fields
+    """
+    Costruttore:
+        Node(__patterns,
+             __num_features, __label = Classification.NONE,
+             __type = NodeType.DECISION,
+             __threshold = 0.0,
+             __num_classi = 2)
+    """
     __nn : NeuralNetwork = field(init=False) #perceptron definition
     __patterns: np.ndarray #field containing training data for perceptron
     __num_features: int #number of features into dataset
@@ -21,10 +30,8 @@ class Node:
     __label: Classification = Classification.NONE
     __type : NodeType = NodeType.DECISION
     __childs : np.ndarray= field(init=False) #list containing childs nodes
-    #__depth : int = 0 #TODO: forse da spostare
     __threshold : float = 0.0
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
-    #__wait_epochs : int = 0 #wait epochs that wait before splitting node if the boundaries don't get any improvement #TODO:forse da spostare
     __num_classi : int = 2
 
     # GETTER & SETTER
@@ -47,11 +54,10 @@ class Node:
         if self.__entropy <= ENTROPY_TH:
             self.__type = NodeType.LEAF
             self.__label = Classification(max(occurs, key=occurs.get))
+            self.__num_classi = 1
+            self.__nn.set_num_classi(1)
 
-    def get_num_features(self) -> int:
-        return self.__num_features
-
-    def __compute_entropy(self) -> Tuple[Union[float, np.ndarray, Iterable, int], Dict[Any, Any]]:
+    def __compute_entropy(self) -> Tuple[Union[float, np.ndarray, Iterable, int], Dict[Any, Any]] or Tuple[None, None]:
         probs = list()
         label = self.__patterns[:, self.__num_features]
         labels, counts = np.unique(label, return_counts=True)
@@ -70,54 +76,76 @@ class Node:
 
         return entropy(probs, base=2), dict(zip(labels, counts))
 
-    #TODO: da finire
-    def train(self) -> None:
+
+    def train(self, epochs: int, wait_epochs: int) -> sklearn.linear_model._perceptron.Perceptron:
+        print(self.__patterns)
+        print(self.__type)
+
         if not self.__type == NodeType.LEAF:
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
-            #TODO: rendere suddivisione riproducibile
-            X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.3,train_size=.7)  # dataset split with 70-30 splitting rule
+            X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
 
-            self.__nn.fit(X_train, y_train) #TODO: ipermarametrizzazione
+            effective_epochs = self.__nn.fit(X_train, y_train, epochs, wait_epochs) #TODO: ipermarametrizzazione
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
 
-            goodware_lts, malware_lts = self.__dataset_split(self.__patterns, data)
+            if effective_epochs == epochs:
+                goodware_lts, malware_lts = self.__dataset_split(self.__patterns, data)
+                self.__childs = np.append(self.__childs, [Node(malware_lts, self.__num_features),
+                                                          Node(goodware_lts, self.__num_features)])
 
-            #TODO: realizzare creazione nodo tenendo conto delle caratteristiche degli LTS
-            self.__childs = np.append(self.__childs, [Node(malware_lts, self.__num_features), Node(goodware_lts, self.__num_features)])
+            else:
+                goodware_node, malware_node = self.__create_split_node(self.__patterns, data)
+                self.__childs = np.append(self.__childs, [malware_node, goodware_node])
+
+            #print(goodware_lts)
+            #print(malware_lts)
+
 
             for child in self.__childs:
-                if not self.__type == NodeType.LEAF:
-                    child.train()
+                child.train(epochs, wait_epochs)
 
-    """"
-    def split_node(self) -> None:
-        self.__type = NodeType.SPLIT
-        left_patterns, right_patterns = np.zeros(1), np.zeros(1) #TODO: da fare funzione che dividi a metà il dataset
-        left_node, right_node = Node(left_patterns, self.__num_features), Node(right_patterns, self.__num_features)
+
+    def __create_split_node(self, lts: np.ndarray, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
+
+        IDEA:
+            * compute barycenter of two class;
+            * find hyperplane orthogonal passing the median point between the two barycenter.
+        --------------
+
+        :param lts: Local Training Set that will be split
+        :param X: patterns which make predictions
+
+        :return: return an arrays containing the two dataset split
+        """
+        return np.array({}), np.array({})
+        #self.__type = NodeType.SPLIT
+        #left_patterns, right_patterns = np.zeros(1), np.zeros(1) #TODO: da fare funzione che dividi a metà il dataset
+        #left_node, right_node = Node(left_patterns, self.__num_features), Node(right_patterns, self.__num_features)
 
         #TODO: controlla l'omogeneità dell' LTS per classificare la tipologia di nodo
-        if None:
-            pass
+        #if None:
+         #   pass
 
-        self.__child.append(left_node)
-        self.__child.append(right_node)
-    """
+        #self.__child.append(left_node)
+        #self.__child.append(right_node)
 
     def __dataset_split(self, lts: np.ndarray, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         This function create a local datasets starting from starting dataset stored in current node based on decision boundary
 
         IDEA:
-          foreach patterns into dataset will be compute the prediction and based on that the dataset will split
+            foreach patterns into dataset will compute the prediction and based on that the dataset will split
 
         --------------
 
         :param lts: Local Training Set that will be split
         :param X: patterns whitch make predictions
 
-        :return: return an array containig the two dataset split
+        :return: return an arrays containig the two dataset split
         """
         lts0 = np.array([])
         lts1 = np.array([])
@@ -156,12 +184,12 @@ def main() -> None:
     print(patterns.shape)
 
     root = Node(patterns, patterns.shape[1] - 1)
-    #X, y = patterns[:, :2], patterns[:, 2]
+    X, y = patterns[:, :2], patterns[:, 2]
 
-    root.train()
+    root.train(255, 5)
 
-    print(root)
-    """
+    #print(root)
+
     #plotting
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')
     plt.scatter(X[y == 1, 0], X[y == 1, 1], label='class 1', marker='s')
@@ -199,6 +227,5 @@ def main() -> None:
     plt.legend()
     plt.show()
     """
-
 if __name__ == "__main__":
     main()
