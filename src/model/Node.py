@@ -27,6 +27,18 @@ class Node:
     #__wait_epochs : int = 0 #wait epochs that wait before splitting node if the boundaries don't get any improvement #TODO:forse da spostare
     __num_classi : int = 2
 
+    # GETTER & SETTER
+    def get_num_features(self) -> int:
+        return self.__num_features
+
+    def get_childs(self) -> np.array:
+        return self.__childs
+
+    def get_type(self) -> NodeType:
+        return self.__type
+
+#-----------------------------------------------------------------------
+
     def __post_init__(self):
         self.__nn = NeuralNetwork(self.__num_features)
         self.__entropy, occurs = self.__compute_entropy()
@@ -47,8 +59,14 @@ class Node:
         for count in counts:
             probs.append(count / len(label))
 
-        #label = dict(zip(label, count))
-        #print(probs)
+        # print(self.__patterns)
+        # print(counts)
+        # print(labels)
+
+        # if np.any(self.__patterns):
+        #   return entropy(probs, base=2), np.zeros(2)
+        # label = dict(zip(label, count))
+        # print(probs)
 
         return entropy(probs, base=2), dict(zip(labels, counts))
 
@@ -155,6 +173,7 @@ def main() -> None:
     plt.legend()
     plt.show()
 
+    """
     lts0, lts1 = root.dataset_split(patterns, X)
     #root.dataset_split(patterns, X)
 
