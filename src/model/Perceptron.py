@@ -1,4 +1,9 @@
 from dataclasses import dataclass, field
+from typing import Tuple
+
+from sklearn.metrics import precision_score
+from numpy.random import RandomState
+
 from Neuron import Neuron
 
 import numpy as np
@@ -10,10 +15,11 @@ class Perceptron:
     __num_features: int
     __weights: np.ndarray = field(init=False)
     __learning_rate : float = 0.1
-    __bias: float = 0.0
+    __bias: float = 1.0
+    __threshold: float = 0.5
 
     def __post_init__(self):
-        self.__weights = np.zeros(self.__num_features) #TODO: realizzare algoritmo migliore per la scelta dei pesi iniziali
+        self.__weights, self.__bias = self.__init_weights()
 
         # if the learning rate value is not between 0 and 1, setting to default value (0.1)
         if not 0 <= self.__learning_rate <= 1:
@@ -29,11 +35,12 @@ class Perceptron:
         y_ = np.array([1 if i > 0 else 0 for i in y])
 
         for _ in range(epochs):
-
             for idx, x_i in enumerate(X):
                 #linear_output = self.__neuron.weighted_sum(self.__weights, self.__bias, x_i)
                 #y_predicted = self.__neuron.af(linear_output)
                 y_predicted = self.predict(x_i)
+
+                #print(f"{y_predicted} -> {y_[idx]}")
 
                 # Perceptron update rule
                 update = self.__learning_rate * (y_[idx] - y_predicted)
@@ -41,13 +48,27 @@ class Perceptron:
                 self.__weights += update * x_i
                 self.__bias += update
 
-    def predict(self, X: np.ndarray) -> int:
+    def predict(self, X: np.ndarray) -> float:
         linear_output = self.__neuron.weighted_sum(self.__weights, self.__bias, X)
 
         return self.__neuron.af(linear_output)
 
+    def __init_weights(self) -> Tuple[np.ndarray, float]:  # Glorot uniform
+        nin: int = self.__num_features + 1
+        nout: int = 1
+        sd = np.sqrt(6.0 / (nin + nout))
+        weigths: np.ndarray = np.empty(nin - 1, dtype=np.float32 )#np.array({}, dtype=np.float32, )
+
+        for i in range(nin - 1):
+            weigths[i] = np.float32(RandomState().uniform(-sd, sd))
+
+        bias = float(RandomState().uniform(-sd, sd))
+
+        return weigths, bias
+
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> float:
         predictions = self.predict(X)
+        predictions = np.where(predictions >= self.__threshold, 1, 0)
 
         accuracy = np.sum(y == predictions) / len(predictions)
         return accuracy
@@ -56,6 +77,7 @@ class Perceptron:
 
 def main() -> None:
     import pandas as pd
+    import matplotlib.pyplot as plt
 
     #dataset preparation
     toy = pd.read_csv("toydata.csv").to_numpy()
@@ -92,12 +114,39 @@ def main() -> None:
 
     perceptron.fit(X_train, y_train, epochs=5)
 
-    print('Model parameters:')
+    print('\nModel parameters:')
     print(f'\tWeights: {perceptron.get_weigths()}')
     print(f'\tBias: {perceptron.get_bias()}\n')
 
     print(f'Train accuracy: {perceptron.evaluate(X_train, y_train) * 100}')
     print(f'Test accuracy: {perceptron.evaluate(X_test, y_test) * 100}')
+
+    #plotting decision boundaries
+    w, b = perceptron.get_weigths(), perceptron.get_bias()
+
+    x0_min = -2
+    x1_min = ((-(w[0] * x0_min) - b)
+              / w[1])
+
+    x0_max = 2
+    x1_max = ((-(w[0] * x0_max) - b)
+              / w[1])
+
+    # x0*w0 + x1*w1 + b = 0
+    # x1  = (-x0*w0 - b) / w1
+
+    fig, ax = plt.subplots(1, 2, sharex=True, figsize=(7, 3))
+
+    ax[0].plot([x0_min, x0_max], [x1_min, x1_max])
+    ax[0].scatter(X_train[y_train == 0, 0], X_train[y_train == 0, 1], label='class 0', marker='o')
+    ax[0].scatter(X_train[y_train == 1, 0], X_train[y_train == 1, 1], label='class 1', marker='s')
+
+    ax[1].plot([x0_min, x0_max], [x1_min, x1_max])
+    ax[1].scatter(X_test[y_test == 0, 0], X_test[y_test == 0, 1], label='class 0', marker='o')
+    ax[1].scatter(X_test[y_test == 1, 0], X_test[y_test == 1, 1], label='class 1', marker='s')
+
+    ax[1].legend(loc='upper left')
+    plt.show()
 
 if __name__ == "__main__":
     main()
