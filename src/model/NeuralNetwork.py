@@ -43,6 +43,7 @@ class NeuralNetwork:
          #   self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1, early_stopping=True, n_iter_no_change=5, tol=1e-4) #TODO: mettere learning rate personalizzabile (eta0; )
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int):
+        #early stopping is useful for reduce training time and save time
         callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
@@ -60,8 +61,8 @@ class NeuralNetwork:
             #print(f'\tConfig: {results.best_params_}')
 
             #print('\nModel parameters:')
-            #print(f'\tWeights: {perceptron.get_weigths()}')
-            #print(f'\tBias: {perceptron.get_bias()}\n')
+        print(f'\tWeights: {self.__model.weights}')
+        #print(f'\tBias: {self.__model.get_bias()}\n')
             #print(f'\tN_iter: {model.n_iter_}')
             #print(f'\tN_weigth update: {model.t_}')
         return hystory
@@ -83,6 +84,9 @@ class NeuralNetwork:
             print(f'\t{str}: {perceptron.score(X, y) * 100}')
         """
         return self.__model.evaluate(X, y, return_dict=True)
+
+    def reinit_weights(self, weights: np.ndarray):
+        self.__model.set_weights(weights)
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
