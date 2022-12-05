@@ -22,7 +22,9 @@ class Node:
              __label = Classification.NONE,
              __type = NodeType.DECISION,
              __threshold = 0.0,
-             __num_classi = 2)
+             __num_classi = 2
+             __is_splitted = False
+             __is_removed = False)
     """
     __nn : NeuralNetwork = field(init=False) #perceptron definition
     __patterns: np.ndarray #field containing training data for perceptron
@@ -34,6 +36,8 @@ class Node:
     __threshold : float = 0.0
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
     __num_classi : int = 2
+    __is_splitted : bool = False #indica se il nodo è stato splittato
+    __is_removed : bool = False #indica se ne nodo è stata effettuata una pattern removal
 
     # GETTER & SETTER
     def get_num_features(self) -> int:
@@ -86,10 +90,13 @@ class Node:
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
             X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
+            classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs = self.__nn.fit(X_train, y_train, epochs, wait_epochs) #TODO: ipermarametrizzazione
+            effective_epochs = self.__nn.fit(X_train, y_train, epochs, wait_epochs)
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
+
+            self.__pattern_removal(list(sorted(zip(classes, counts)))[0][0])
 
             #da cambiare la condizione
             if effective_epochs == epochs:
@@ -99,52 +106,32 @@ class Node:
                                                           Node(goodware_lts, self.__num_features)])
 
             #else:
-             #   goodware_node, malware_node, _, _ = self.__create_split_node(self.__patterns, data)
+             #   goodware_lts, malware_lts, _, _ = self.__create_split_node(self.__patterns, data)
               #  self.__childs = np.append(self.__childs, [malware_node, goodware_node])
 
             #print(goodware_lts)
             #print(malware_lts)
 
-
             for child in self.__childs:
                 child.train(epochs, wait_epochs)
 
-    #def __pattern_removal(self, data1: np.ndarray, data2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def __pattern_removal(self, min_class) -> None:
         """
         The aim is to remove a pattern that need extra training in case of low probabilities class in case the node are
         able to classify correctly.
         This is a way to save time for training process, because if not done, it would require me to have extra hyperplanes
         to classify correctly.
 
-        IDEA:
-            * check is to execute the pattern removal
-            * if true, then remove low probabilities class
-            * otherwise, keep data
+        IDEA (semplificazione):
+            * check if node is leaf and the enthropy value is less the certain value
+            * remove the pattern labeled min_class
 
-        :param: data1 contains patterns of first LTS
-        :param: data2 contains patterns of second LTS
+        :param: min_class contain class that the patterns will be removed
         :return: LTS without low probabilities pattern's class
         """
-        #TODO: da implementare
-        #return np.array([]), np.array([])
-
-    #def __check_removal(self, data: np.ndarray) -> bool:
-        """
-        Check if pattern removal is required.
-        To determine that I need to check the following condition:
-            * classification uncertainty
-            * reliability of the training process
-
-        IDEA:
-            * compute uncertainty and reliability
-            * if relevant uncertainty exist in pattern classification and perceptron is reliable, the pattern is considered
-              difficult to classify, so need to remove it
-
-        :param data: data to evaluate if pattern removal is required
-        :return: if true pattern removal is required, otherwise not
-        """
-        #TODO: da implemetare
-        #return True
+        if self.__entropy <= ENTROPY_TH and not self.__type == NodeType.LEAF:
+            self.__patterns = np.delete(self.__patterns, np.where(self.__patterns[self.__num_features] == min_class), 0)
+            self.__is_removed = True
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -180,6 +167,7 @@ class Node:
         #print(self.__nn.get_weight())
 
         lts0, lts1 = self.__dataset_split(lts, X)
+        self.__is_splitted = True
 
         return lts0, lts1, centroids, center
 
@@ -192,7 +180,7 @@ class Node:
         :return: array containing the largest classes
         """
         classes, counts = np.unique(lts[:, self.__num_features], return_counts=True)
-        top_classes = list(sorted(zip(classes, counts)))[:num_largest]
+        top_classes = list(sorted(zip(classes, counts), reverse=True))[:num_largest]
         largest_classes = np.zeros(num_largest)
 
         for i in range(num_largest):
