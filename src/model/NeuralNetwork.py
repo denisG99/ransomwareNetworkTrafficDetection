@@ -125,7 +125,6 @@ def main() -> None:
     print(f"Testing -> {nn.evaluate(X_test, y_test)}")
     print(statistics.history['loss'])
 
-
     #for pattern, expected_y in zip(X_test, y_test):
      #   print(f"{nn.predict(pattern.reshape(1, -1))} -> {expected_y}")
 
