@@ -45,7 +45,7 @@ class NeuralNetwork:
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1)]
+        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1, )]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 

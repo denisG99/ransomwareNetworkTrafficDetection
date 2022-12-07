@@ -84,7 +84,7 @@ class Node:
         return entropy(probs, base=2), dict(zip(labels, counts))
 
 
-    def train(self, epochs: int, wait_epochs: int, plot) -> None:
+    def train(self, epochs: int, wait_epochs: int, plot = None) -> None:
         #print(self.__patterns)
         #print(self.__type)
 
@@ -320,10 +320,11 @@ class Node:
         if self.__type == NodeType.LEAF:
             return self.__label
         else:
-            if self.__nn.predict(X.reshape(1, -1)) >= 0.5:
+            if self.__nn.predict(X) >= 0.5:
                 return self.__childs[0].predict(X)
             else:
                 return self.__childs[1].predict(X)
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
@@ -336,7 +337,7 @@ def main() -> None:
 
     #patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
     #print(patterns.shape)
-    X, y = make_circles(100)
+    X, y = make_moons(100)
 
     #print(X)
     y= np.reshape(y, (100, 1))
@@ -355,6 +356,7 @@ def main() -> None:
     #x = np.linspace(-3, 3, 10)
 
     #plotting
+    """
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')
     plt.scatter(X[y == 1, 0], X[y == 1, 1], label='class 1', marker='s')
     plt.title('Dataset')
@@ -369,9 +371,9 @@ def main() -> None:
     #plt.plot(x, -((split_rule[0] * x - split_rule[2]) / split_rule[1]), '-r')
     plt.legend()
     plt.show()
-
+    """
     #print(root)
-    print(root.predict(np.array([0, 0,]).reshape(1, -1)))
+    print(root.predict(np.array([0, 0,]).reshape((1, -1))))
     """
     lts0, lts1 = root.dataset_split(patterns, X)
     #root.dataset_split(patterns, X)
