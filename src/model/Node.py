@@ -4,6 +4,8 @@ from typing import Tuple, Union, Dict, Any, Iterable
 from sklearn.model_selection import train_test_split
 from scipy.stats import entropy
 
+from matplotlib import pyplot as plt
+
 from NeuralNetwork import NeuralNetwork
 from NodeType import NodeType
 from Classification import Classification
@@ -22,22 +24,20 @@ class Node:
              __label = Classification.NONE,
              __type = NodeType.DECISION,
              __threshold = 0.0,
-             __num_classi = 2
-             __is_splitted = False
-             __is_removed = False)
+             __num_classi = 2)
     """
     __nn : NeuralNetwork = field(init=False) #perceptron definition
-    __patterns: np.ndarray #field containing training data for perceptron
-    __num_features: int #number of features into dataset
     __entropy: float = field(init=False)  # dataset entropy
+    __childs: np.ndarray = field(init=False)  # list containing childs nodes
+    __is_splitted: bool = field(init=False)  # indicate if node is split
+    __is_removed: bool = field(init=False)  # indicate if node has executed pattern removal
+    __patterns: np.ndarray  # field containing training data for perceptron
+    __num_features: int  # number of features into dataset
     __label: Classification = Classification.NONE
     __type : NodeType = NodeType.DECISION
-    __childs : np.ndarray= field(init=False) #list containing childs nodes
     __threshold : float = 0.0
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
     __num_classi : int = 2
-    __is_splitted : bool = False #indica se il nodo è stato splittato
-    __is_removed : bool = False #indica se ne nodo è stata effettuata una pattern removal
 
     # GETTER & SETTER
     def get_num_features(self) -> int:
@@ -55,6 +55,8 @@ class Node:
         self.__nn = NeuralNetwork(self.__num_features)
         self.__entropy, occurs = self.__compute_entropy()
         self.__childs = np.array([], dtype=Node)
+        self.__is_splitted = False
+        self.__is_removed = False
 
         if self.__entropy <= ENTROPY_TH:
             self.__type = NodeType.LEAF
@@ -82,40 +84,51 @@ class Node:
         return entropy(probs, base=2), dict(zip(labels, counts))
 
 
-    def train(self, epochs: int, wait_epochs: int) -> None:
-        print(self.__patterns)
-        print(self.__type)
+    def train(self, epochs: int, wait_epochs: int, plot) -> None:
+        #print(self.__patterns)
+        #print(self.__type)
 
         if not self.__type == NodeType.LEAF:
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
             X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
-            classes, counts = np.unique(target, return_counts=True)
+            #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs = self.__nn.fit(X_train, y_train, epochs, wait_epochs)
+            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs)
+
+            #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
+             #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
 
-            self.__pattern_removal(list(sorted(zip(classes, counts)))[0][0])
+            lts0, lts1 = self.__dataset_split(self.__patterns, data)
 
-            #da cambiare la condizione
-            if effective_epochs == epochs:
-                goodware_lts, malware_lts = self.__dataset_split(self.__patterns, data)
+            if np.any(lts0) or np.any(lts1):
+                lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
 
-                self.__childs = np.append(self.__childs, [Node(malware_lts, self.__num_features),
-                                                          Node(goodware_lts, self.__num_features)])
+            #goodware_lts = self.__pattern_removal(goodware_lts)
+            #malware_lts= self.__pattern_removal(malware_lts)
+            self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
+                                                      Node(lts0, self.__num_features)])
 
             #else:
-             #   goodware_lts, malware_lts, _, _ = self.__create_split_node(self.__patterns, data)
-              #  self.__childs = np.append(self.__childs, [malware_node, goodware_node])
+             #   lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
+
+                #lts0 = self.__pattern_removal(lts0)
+                #lts1 = self.__pattern_removal(lts1)
+
+                #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
+                 #                                         Node(lts0, self.__num_features)])
 
             #print(goodware_lts)
             #print(malware_lts)
 
-            for child in self.__childs:
-                child.train(epochs, wait_epochs)
+            #for child in self.__childs:
+             #   child.train(epochs, wait_epochs, plot)
 
-    def __pattern_removal(self, min_class) -> None:
+            return plot
+
+    #def __pattern_removal(self, data: np.ndarray, entropy: float) -> np.ndarray:
         """
         The aim is to remove a pattern that need extra training in case of low probabilities class in case the node are
         able to classify correctly.
@@ -123,15 +136,22 @@ class Node:
         to classify correctly.
 
         IDEA (semplificazione):
-            * check if node is leaf and the enthropy value is less the certain value
+            * check if node have less or equal to certain entropy value
             * remove the pattern labeled min_class
 
-        :param: min_class contain class that the patterns will be removed
+        :param: data contain
         :return: LTS without low probabilities pattern's class
         """
-        if self.__entropy <= ENTROPY_TH and not self.__type == NodeType.LEAF:
+        """
+        classes, counts = np.unique(data[:, self.__num_features], return_counts=True)
+        min_class= list(sorted(zip(classes, counts)))[0][0]
+        
+        if entropy <= ENTROPY_TH: #and not self.__type == NodeType.LEAF:
             self.__patterns = np.delete(self.__patterns, np.where(self.__patterns[self.__num_features] == min_class), 0)
             self.__is_removed = True
+        
+        return data
+        """
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -177,6 +197,7 @@ class Node:
 
         :param lts: Local Training Set that will be split
         :param num_largest: the first n the largest classes
+
         :return: array containing the largest classes
         """
         classes, counts = np.unique(lts[:, self.__num_features], return_counts=True)
@@ -192,6 +213,7 @@ class Node:
         """
         :param data: dataset we want to split
         :param class_id: class that want to take
+
         :return: array containing record correspondent to a given class
         """
         return data[np.where(data[:, self.__num_features] == class_id)]
@@ -199,6 +221,7 @@ class Node:
     def __get_centroid(self, data: np.ndarray) -> np.ndarray:
         """
         :param data: dataset witch want to compute centroid
+
         :return: array containing centroid's coordinates
         """
         centroid_cords = np.zeros(self.__num_features)
@@ -214,6 +237,7 @@ class Node:
                             ((x1+x2+x3+...+xn)/2, (y1+y2+y3+...+yn)/2, ...)
 
         :param centroids: array containing centroids coordinates
+
         :return: array containing center coordinates
         """
         center = np.zeros(self.__num_features)
@@ -236,6 +260,7 @@ class Node:
 
         :param points: centroids list
         :param p: median point between two centroids
+
         :return: array contains hyperplane's coefficients
         """
         #TODO: da sistemare il fatto che iperpiano non passa per il punto centrale e non è ortogonale alla retta passante per i due centroidi
@@ -285,7 +310,6 @@ class Node:
         return lts0, lts1
 
     def predict(self, X) -> float:
-        #TODO: da fare
         return self.__nn.predict(X.reshape(1, -1))
 
 
@@ -294,22 +318,30 @@ class Node:
 def main() -> None:
     import pandas as pd
     import matplotlib.pyplot as plt
+    from sklearn.datasets import make_moons
+    from sklearn.datasets import make_circles
+    import numpy as np
 
 
     patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
     #print(patterns.shape)
+    #X, y = make_circles(100)
+
+    #print(X)
+    #y= np.reshape(y, (100, 1))
+    #patterns = np.append(X, y, axis=1)
 
     root = Node(patterns, patterns.shape[1] - 1)
     X, y = patterns[:, :2], patterns[:, 2]
 
-    #root.train(255, 5)
+    root.train(500, 5, plt.plot())
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
     #print(centroids)
     #split_rule = root.split_hyperplane(centroids, center)
 
-    x = np.linspace(-3, 3, 10)
+    #x = np.linspace(-3, 3, 10)
 
     #plotting
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')
