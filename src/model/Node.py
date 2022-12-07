@@ -4,6 +4,8 @@ from typing import Tuple, Union, Dict, Any, Iterable
 from sklearn.model_selection import train_test_split
 from scipy.stats import entropy
 
+from matplotlib import pyplot as plt
+
 from NeuralNetwork import NeuralNetwork
 from NodeType import NodeType
 from Classification import Classification
@@ -25,12 +27,14 @@ class Node:
              __num_classi = 2)
     """
     __nn : NeuralNetwork = field(init=False) #perceptron definition
-    __patterns: np.ndarray #field containing training data for perceptron
-    __num_features: int #number of features into dataset
     __entropy: float = field(init=False)  # dataset entropy
+    __childs: np.ndarray = field(init=False)  # list containing childs nodes
+    __is_splitted: bool = field(init=False)  # indicate if node is split
+    __is_removed: bool = field(init=False)  # indicate if node has executed pattern removal
+    __patterns: np.ndarray  # field containing training data for perceptron
+    __num_features: int  # number of features into dataset
     __label: Classification = Classification.NONE
     __type : NodeType = NodeType.DECISION
-    __childs : np.ndarray= field(init=False) #list containing childs nodes
     __threshold : float = 0.0
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
     __num_classi : int = 2
@@ -51,6 +55,8 @@ class Node:
         self.__nn = NeuralNetwork(self.__num_features)
         self.__entropy, occurs = self.__compute_entropy()
         self.__childs = np.array([], dtype=Node)
+        self.__is_splitted = False
+        self.__is_removed = False
 
         if self.__entropy <= ENTROPY_TH:
             self.__type = NodeType.LEAF
@@ -78,73 +84,81 @@ class Node:
         return entropy(probs, base=2), dict(zip(labels, counts))
 
 
-    def train(self, epochs: int, wait_epochs: int) -> None:
-        print(self.__patterns)
-        print(self.__type)
+    def train(self, epochs: int, wait_epochs: int, plot) -> None:
+        #print(self.__patterns)
+        #print(self.__type)
 
         if not self.__type == NodeType.LEAF:
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
             X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
+            #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs = self.__nn.fit(X_train, y_train, epochs, wait_epochs) #TODO: ipermarametrizzazione
+            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs)
+
+            #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
+             #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
 
-            #da cambiare la condizione
-            if effective_epochs == epochs:
-                goodware_lts, malware_lts = self.__dataset_split(self.__patterns, data)
+            lts0, lts1 = self.__dataset_split(self.__patterns, data)
 
-                self.__childs = np.append(self.__childs, [Node(malware_lts, self.__num_features),
-                                                          Node(goodware_lts, self.__num_features)])
+            #print(np.any(lts0))
+            #print(np.any(lts1))
+
+            if not np.any(lts0) or not np.any(lts1):
+                #print("Creazione split rule")
+                lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
+
+            #goodware_lts = self.__pattern_removal(goodware_lts)
+            #malware_lts= self.__pattern_removal(malware_lts)
+            self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
+                                                      Node(lts0, self.__num_features)])
 
             #else:
-             #   goodware_node, malware_node, _, _ = self.__create_split_node(self.__patterns, data)
-              #  self.__childs = np.append(self.__childs, [malware_node, goodware_node])
+             #   lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
+
+                #lts0 = self.__pattern_removal(lts0)
+                #lts1 = self.__pattern_removal(lts1)
+
+                #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
+                 #                                         Node(lts0, self.__num_features)])
 
             #print(goodware_lts)
             #print(malware_lts)
 
+            #for child in self.__childs:
+             #   child.train(epochs, wait_epochs, plot)
 
-            for child in self.__childs:
-                child.train(epochs, wait_epochs)
+            print(f"Training -> {self.__nn.evaluate(X_train, y_train)}")
+            print(f"Testing -> {self.__nn.evaluate(X_test, y_test)}")
 
-    #def __pattern_removal(self, data1: np.ndarray, data2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+            return plot
+
+    #def __pattern_removal(self, data: np.ndarray, entropy: float) -> np.ndarray:
         """
         The aim is to remove a pattern that need extra training in case of low probabilities class in case the node are
         able to classify correctly.
         This is a way to save time for training process, because if not done, it would require me to have extra hyperplanes
         to classify correctly.
 
-        IDEA:
-            * check is to execute the pattern removal
-            * if true, then remove low probabilities class
-            * otherwise, keep data
+        IDEA (semplificazione):
+            * check if node have less or equal to certain entropy value
+            * remove the pattern labeled min_class
 
-        :param: data1 contains patterns of first LTS
-        :param: data2 contains patterns of second LTS
+        :param: data contain
         :return: LTS without low probabilities pattern's class
         """
-        #TODO: da implementare
-        #return np.array([]), np.array([])
-
-    #def __check_removal(self, data: np.ndarray) -> bool:
         """
-        Check if pattern removal is required.
-        To determine that I need to check the following condition:
-            * classification uncertainty
-            * reliability of the training process
-
-        IDEA:
-            * compute uncertainty and reliability
-            * if relevant uncertainty exist in pattern classification and perceptron is reliable, the pattern is considered
-              difficult to classify, so need to remove it
-
-        :param data: data to evaluate if pattern removal is required
-        :return: if true pattern removal is required, otherwise not
+        classes, counts = np.unique(data[:, self.__num_features], return_counts=True)
+        min_class= list(sorted(zip(classes, counts)))[0][0]
+        
+        if entropy <= ENTROPY_TH: #and not self.__type == NodeType.LEAF:
+            self.__patterns = np.delete(self.__patterns, np.where(self.__patterns[self.__num_features] == min_class), 0)
+            self.__is_removed = True
+        
+        return data
         """
-        #TODO: da implemetare
-        #return True
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -180,6 +194,7 @@ class Node:
         #print(self.__nn.get_weight())
 
         lts0, lts1 = self.__dataset_split(lts, X)
+        self.__is_splitted = True
 
         return lts0, lts1, centroids, center
 
@@ -189,10 +204,11 @@ class Node:
 
         :param lts: Local Training Set that will be split
         :param num_largest: the first n the largest classes
+
         :return: array containing the largest classes
         """
         classes, counts = np.unique(lts[:, self.__num_features], return_counts=True)
-        top_classes = list(sorted(zip(classes, counts)))[:num_largest]
+        top_classes = list(sorted(zip(classes, counts), reverse=True))[:num_largest]
         largest_classes = np.zeros(num_largest)
 
         for i in range(num_largest):
@@ -204,6 +220,7 @@ class Node:
         """
         :param data: dataset we want to split
         :param class_id: class that want to take
+
         :return: array containing record correspondent to a given class
         """
         return data[np.where(data[:, self.__num_features] == class_id)]
@@ -211,6 +228,7 @@ class Node:
     def __get_centroid(self, data: np.ndarray) -> np.ndarray:
         """
         :param data: dataset witch want to compute centroid
+
         :return: array containing centroid's coordinates
         """
         centroid_cords = np.zeros(self.__num_features)
@@ -226,6 +244,7 @@ class Node:
                             ((x1+x2+x3+...+xn)/2, (y1+y2+y3+...+yn)/2, ...)
 
         :param centroids: array containing centroids coordinates
+
         :return: array containing center coordinates
         """
         center = np.zeros(self.__num_features)
@@ -248,6 +267,7 @@ class Node:
 
         :param points: centroids list
         :param p: median point between two centroids
+
         :return: array contains hyperplane's coefficients
         """
         #TODO: da sistemare il fatto che iperpiano non passa per il punto centrale e non è ortogonale alla retta passante per i due centroidi
@@ -297,7 +317,6 @@ class Node:
         return lts0, lts1
 
     def predict(self, X) -> float:
-        #TODO: da fare
         return self.__nn.predict(X.reshape(1, -1))
 
 
@@ -306,22 +325,30 @@ class Node:
 def main() -> None:
     import pandas as pd
     import matplotlib.pyplot as plt
+    from sklearn.datasets import make_moons
+    from sklearn.datasets import make_circles
+    import numpy as np
 
 
     patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
     #print(patterns.shape)
+    #X, y = make_circles(100)
+
+    #print(X)
+    #y= np.reshape(y, (100, 1))
+    #patterns = np.append(X, y, axis=1)
 
     root = Node(patterns, patterns.shape[1] - 1)
     X, y = patterns[:, :2], patterns[:, 2]
 
-    #root.train(255, 5)
+    root.train(250, 5, plt.plot())
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
     #print(centroids)
     #split_rule = root.split_hyperplane(centroids, center)
 
-    x = np.linspace(-3, 3, 10)
+    #x = np.linspace(-3, 3, 10)
 
     #plotting
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')

@@ -33,15 +33,15 @@ class NeuralTree:
 
     def train(self, epochs: int, verbose: bool = False) -> None:
         for epoch in range(epochs):
-            if verbose:
-                print(f"-- Epoch {epoch + 1}")
+            #if verbose:
+             #   print(f"-- Epoch {epoch + 1}")
 
             model = self.__root.train()
 
-            if verbose:
-                print(f"\tWeights: {model.coef_}")
-                print(f"\tBias: {model.intercept_}")
-                print(f"\n")
+            #if verbose:
+             #   print(f"\tWeights: {model.coef_}")
+              #  print(f"\tBias: {model.intercept_}")
+               # print(f"\n")
 
 #-----------------------------------------------------------------------------------------------------------------------
 
