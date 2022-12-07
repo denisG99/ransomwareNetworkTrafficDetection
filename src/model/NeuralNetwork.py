@@ -69,11 +69,10 @@ class NeuralNetwork:
         return hystory, self.__model.weights
 
     def predict(self, X: np.ndarray) -> float:
-        prediction = self.__model.predict(X, batch_size=X.shape[1], verbose=0)
+        #prediction = self.__model.predict(X, batch_size=1, verbose=0)
         #for perceptron in self.__perceptrons:
          #   output = perceptron.predict(X)
-
-        return prediction
+        return self.__model.predict(X, batch_size=X.shape[0], verbose=0)
 
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> dict:
         """
@@ -122,9 +121,11 @@ def main() -> None:
 
     statistics = nn.fit(X_train, y_train, 500, 5)
 
+    print(nn.predict(X_test))
+
     print(f"Training -> {nn.evaluate(X_train, y_train)}")
     print(f"Testing -> {nn.evaluate(X_test, y_test)}")
-    print(statistics.history['loss'])
+    #print(statistics.history['loss'])
 
     #for pattern, expected_y in zip(X_test, y_test):
      #   print(f"{nn.predict(pattern.reshape(1, -1))} -> {expected_y}")
