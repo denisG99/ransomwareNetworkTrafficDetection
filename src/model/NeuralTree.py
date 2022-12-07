@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+import numpy as np
+
 from Node import Node
 from NodeType import NodeType
 from Classification import Classification
@@ -32,25 +34,20 @@ class NeuralTree:
         #self.__num_nodes += 1
 
     def train(self, epochs: int, verbose: bool = False) -> None:
-        for epoch in range(epochs):
-            #if verbose:
-             #   print(f"-- Epoch {epoch + 1}")
+            self.__root.train(epochs, self.__wait_epochs)
 
-            model = self.__root.train()
-
-            #if verbose:
-             #   print(f"\tWeights: {model.coef_}")
-              #  print(f"\tBias: {model.intercept_}")
-               # print(f"\n")
+    def make_prediction(self, sample: np.ndarray) -> Classification:
+        return self.__root.predict(sample.reshape((1, -1)))
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
     nt = NeuralTree("./toydata.csv")
 
-    nt.train(1)
+    nt.train(250)
 
-    print(nt)
+    print(nt.make_prediction(np.array([0, 0])))
+
 
 if __name__ == "__main__":
     main()
