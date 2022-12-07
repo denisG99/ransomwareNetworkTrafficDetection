@@ -103,7 +103,11 @@ class Node:
 
             lts0, lts1 = self.__dataset_split(self.__patterns, data)
 
-            if np.any(lts0) or np.any(lts1):
+            #print(np.any(lts0))
+            #print(np.any(lts1))
+
+            if not np.any(lts0) or not np.any(lts1):
+                #print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
 
             #goodware_lts = self.__pattern_removal(goodware_lts)
@@ -125,6 +129,9 @@ class Node:
 
             #for child in self.__childs:
              #   child.train(epochs, wait_epochs, plot)
+
+            print(f"Training -> {self.__nn.evaluate(X_train, y_train)}")
+            print(f"Testing -> {self.__nn.evaluate(X_test, y_test)}")
 
             return plot
 
@@ -334,7 +341,7 @@ def main() -> None:
     root = Node(patterns, patterns.shape[1] - 1)
     X, y = patterns[:, :2], patterns[:, 2]
 
-    root.train(500, 5, plt.plot())
+    root.train(250, 5, plt.plot())
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
