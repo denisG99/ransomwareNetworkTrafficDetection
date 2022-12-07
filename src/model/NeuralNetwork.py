@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Tuple, Any, List
 
 from keras.callbacks import EarlyStopping, CSVLogger
 #from Perceptron import Perceptron
@@ -48,7 +49,7 @@ class NeuralNetwork:
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
-        hystory = self.__model.fit(X, y, epochs=epochs, batch_size=1, verbose=1, validation_split=0.1, callbacks=callbacks)
+        hystory = self.__model.fit(X, y, epochs=epochs, batch_size=1, verbose=0, validation_split=0.1, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -61,11 +62,11 @@ class NeuralNetwork:
             #print(f'\tConfig: {results.best_params_}')
 
             #print('\nModel parameters:')
-        print(f'\tWeights: {self.__model.weights}')
+        #print(f'\tWeights: {self.__model.weights}')
         #print(f'\tBias: {self.__model.get_bias()}\n')
             #print(f'\tN_iter: {model.n_iter_}')
             #print(f'\tN_weigth update: {model.t_}')
-        return hystory
+        return hystory, self.__model.weights
 
     def predict(self, X: np.ndarray) -> float:
         prediction = self.__model.predict(X, batch_size=X.shape[1], verbose=0)
