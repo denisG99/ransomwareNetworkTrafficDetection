@@ -84,7 +84,7 @@ class Node:
         return entropy(probs, base=2), dict(zip(labels, counts))
 
 
-    def train(self, epochs: int, wait_epochs: int, plot = None) -> None:
+    def train(self, epochs: int, wait_epochs: int, plot = None, verbose: int = 0) -> None:
         #print(self.__patterns)
         #print(self.__type)
 
@@ -94,21 +94,21 @@ class Node:
             X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
             #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs)
+            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs, verbose=verbose)
 
             #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
              #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
 
-            lts0, lts1 = self.__dataset_split(self.__patterns, data)
+            lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
 
             #print(np.any(lts0))
             #print(np.any(lts1))
 
             if not np.any(lts0) or not np.any(lts1):
                 #print("Creazione split rule")
-                lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
+                lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
             #goodware_lts = self.__pattern_removal(goodware_lts)
             #malware_lts= self.__pattern_removal(malware_lts)
@@ -128,7 +128,7 @@ class Node:
             #print(malware_lts)
 
             for child in self.__childs:
-                child.train(epochs, wait_epochs, plot)
+                child.train(epochs, wait_epochs, plot, verbose=verbose)
 
             #print(f"Training -> {self.__nn.evaluate(X_train, y_train)}")
             #print(f"Testing -> {self.__nn.evaluate(X_test, y_test)}")
@@ -160,7 +160,7 @@ class Node:
         return data
         """
 
-    def __create_split_node(self, lts: np.ndarray, X: np.ndarray): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
+    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
 
@@ -193,7 +193,7 @@ class Node:
         self.__nn.reinit_weights(split_rule)
         #print(self.__nn.get_weight())
 
-        lts0, lts1 = self.__dataset_split(lts, X)
+        lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
         self.__is_splitted = True
 
         return lts0, lts1, centroids, center
@@ -280,7 +280,7 @@ class Node:
         return hyperplane
 
 
-    def __dataset_split(self, lts: np.ndarray, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def __dataset_split(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         """
         This function create a local datasets starting from starting dataset stored in current node based on decision boundary
 
@@ -300,7 +300,7 @@ class Node:
         for pattern, row in zip(X, lts):
             #print(pattern)
             #print(row)
-            if self.__nn.predict(pattern.reshape(1, -1)) >= 0.5:
+            if self.__nn.predict(pattern.reshape(1, -1), verbose=verbose) >= 0.5:
                 lts1 = np.append(lts1, row)
             else:
                 lts0 = np.append(lts0, row)
@@ -316,14 +316,14 @@ class Node:
         #return lts0.reshape(row0, self.__num_features + 1), lts1.reshape(row1, self.__num_features + 1)
         return lts0, lts1
 
-    def predict(self, X) -> Classification:
+    def predict(self, X, verbose: int = 0) -> Classification:
         if self.__type == NodeType.LEAF:
             return self.__label
         else:
             if self.__nn.predict(X) >= 0.5:
-                return self.__childs[0].predict(X)
+                return self.__childs[0].predict(X, verbose=verbose)
             else:
-                return self.__childs[1].predict(X)
+                return self.__childs[1].predict(X, verbose=verbose)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -332,19 +332,23 @@ def main() -> None:
     import matplotlib.pyplot as plt
     from sklearn.datasets import make_moons
     from sklearn.datasets import make_circles
+    from sklearn.datasets import make_classification
     import numpy as np
 
 
     #patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
     #print(patterns.shape)
-    X, y = make_moons(100)
+    #X, y = make_moons(100)
+    X, y = make_classification(10000, 40, n_classes=2)
+
 
     #print(X)
-    y= np.reshape(y, (100, 1))
+    y= np.reshape(y, (10000, 1))
     patterns = np.append(X, y, axis=1)
 
     root = Node(patterns, patterns.shape[1] - 1)
-    X, y = patterns[:, :2], patterns[:, 2]
+    #X, y = patterns[:, :2], patterns[:, 2]
+    #X, y = patterns[0], patterns[1]
 
     root.train(250, 5, plt.plot())
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
@@ -373,7 +377,7 @@ def main() -> None:
     plt.show()
     """
     #print(root)
-    print(root.predict(np.array([0, 0,]).reshape((1, -1))))
+    print(root.predict(np.zeros(40).reshape((1, -1))))
     """
     lts0, lts1 = root.dataset_split(patterns, X)
     #root.dataset_split(patterns, X)

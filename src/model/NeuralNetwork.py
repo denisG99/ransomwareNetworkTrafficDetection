@@ -43,9 +43,9 @@ class NeuralNetwork:
         #for i in range(self.__num_perceptrons):
          #   self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1, early_stopping=True, n_iter_no_change=5, tol=1e-4) #TODO: mettere learning rate personalizzabile (eta0; )
 
-    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int):
+    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1, )]
+        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=verbose)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
@@ -68,11 +68,11 @@ class NeuralNetwork:
             #print(f'\tN_weigth update: {model.t_}')
         return hystory, self.__model.weights
 
-    def predict(self, X: np.ndarray) -> float:
+    def predict(self, X: np.ndarray, verbose: int = 0) -> float:
         #prediction = self.__model.predict(X, batch_size=1, verbose=0)
         #for perceptron in self.__perceptrons:
          #   output = perceptron.predict(X)
-        return self.__model.predict(X, batch_size=X.shape[0], verbose=0)
+        return self.__model.predict(X, batch_size=X.shape[0], verbose=verbose)
 
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> dict:
         """
@@ -99,10 +99,13 @@ class NeuralNetwork:
 
 def main() -> None:
     import pandas as pd
+    from sklearn.datasets import make_classification
 
-    toy = pd.read_csv("toydata.csv").to_numpy()
+    #toy = pd.read_csv("toydata.csv").to_numpy()
+    toy = make_classification(10000, 40, n_classes=2)
 
-    X, y = toy[:, :2], toy[:, 2]
+    X, y = toy[0], toy[1]
+    #X, y = toy[:, :toy.shape[1]], toy[:, toy.shape[1]]
 
     shuffle_idx = np.arange(y.shape[0])
     shuffle_rng = np.random.RandomState(123)
@@ -117,11 +120,11 @@ def main() -> None:
     #X_train = (X_train - mu) / sigma
     #X_test = (X_test - mu) / sigma
 
-    nn = NeuralNetwork(2)
+    nn = NeuralNetwork(X.shape[1])
 
     statistics = nn.fit(X_train, y_train, 500, 5)
 
-    print(nn.predict(X_test))
+    #print(nn.predict(X_test))
 
     print(f"Training -> {nn.evaluate(X_train, y_train)}")
     print(f"Testing -> {nn.evaluate(X_test, y_test)}")
