@@ -13,7 +13,7 @@ class NeuralTree:
     """
     Costruttore:
         NeuralTree(__data_path,
-                   __wait_epochs)
+                   __wait_epochs = 0)
         """
     __root : Node = field(init=False)
     __data_path : str
@@ -36,8 +36,18 @@ class NeuralTree:
     def train(self, epochs: int, verbose: int = 0) -> None:
             self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
 
-    def make_prediction(self, sample: np.ndarray, verbose: int = 0) -> Classification:
+    def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> Classification:
         return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
+
+    #TODO: ampliare le metriche di valutazione nel momento in cui serva
+    def evaluate(self, X: np.ndarray, y: np.ndarray, verbose: int = 0) -> float:
+        predictions: np.ndarray = np.array([])
+
+        #TODO: trovare modo per togliere for sfruttando funzioni offerte da numpy
+        for record in X:
+            predictions = np.append(predictions, [self.make_predictions(record, verbose=verbose).value])
+
+        return (np.sum(y==predictions) / predictions.shape[0]) * 100
 
     def save_model(self) -> None:
         """
@@ -76,7 +86,12 @@ def main() -> None:
     nt.train(250, verbose=0)
 
     print(f"Time for training: {time.time() - start_time} secondi")
-    print(nt.make_prediction(np.array([0, 0]), verbose=0))
+    print(nt.make_predictions(np.array([0, 0]), verbose=0))
+
+    #VALUTAZIONE MODELLO
+    data = pd.read_csv("./toydata.csv", header=None).to_numpy()
+
+    print(f"Precision: {nt.evaluate(data[:, 0 : 2], data[:, 2], verbose=0)}%")
 
 if __name__ == "__main__":
     main()

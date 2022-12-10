@@ -11,7 +11,7 @@ from NodeType import NodeType
 from Classification import Classification
 
 import numpy as np
-#import sklearn
+import uuid
 
 ENTROPY_TH: float = 0.1 #TODO: da cambiare
 
@@ -23,9 +23,10 @@ class Node:
              __num_features,
              __label = Classification.NONE,
              __type = NodeType.DECISION,
-             __threshold = 0.0,
+             __threshold = 0.5,
              __num_classi = 2)
     """
+    __id: str = field(init=False, repr=False) #node identifier used in logging
     __nn : NeuralNetwork = field(init=False, repr=False) #perceptron definition
     __entropy: float = field(init=False)  # dataset entropy
     __childs: np.ndarray = field(init=False)  # list containing childs nodes
@@ -35,7 +36,7 @@ class Node:
     __num_features: int  # number of features into dataset
     __label: Classification = Classification.NONE
     __type : NodeType = NodeType.DECISION
-    __threshold : float = 0.0
+    __threshold : float = 0.5
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
     __num_classi : int = 2
 
@@ -52,6 +53,7 @@ class Node:
 #-----------------------------------------------------------------------
 
     def __post_init__(self):
+        self.__id = str(uuid.uuid4())
         self.__nn = NeuralNetwork(self.__num_features)
         self.__entropy, occurs = self.__compute_entropy()
         self.__childs = np.array([], dtype=Node)
@@ -87,8 +89,10 @@ class Node:
     def train(self, epochs: int, wait_epochs: int, plot = None, verbose: int = 0) -> None:
         #print(self.__patterns)
         #print(self.__type)
+        #print(f"START TRAINING Node {self.__id}")
 
         if not self.__type == NodeType.LEAF:
+            #TODO da togliere la divisione in train e test set
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
             X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
@@ -115,6 +119,8 @@ class Node:
             self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
                                                       Node(lts0, self.__num_features)])
 
+            #print(f"\tNode {self.__id} is {self.__type} Node (Label -> {self.__label})")
+
             #else:
              #   lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
 
@@ -130,35 +136,15 @@ class Node:
             for child in self.__childs:
                 child.train(epochs, wait_epochs, plot, verbose=verbose)
 
-            #print(f"Training -> {self.__nn.evaluate(X_train, y_train)}")
-            #print(f"Testing -> {self.__nn.evaluate(X_test, y_test)}")
+            #print(f"END TRAINING Node {self.__id}")
 
-            return plot
+            print(f"VALUTAZIONE NODO {self.__id}")
+            print(f"\tTraining -> {self.__nn.evaluate(X_train, y_train)}")
+            print(f"\tTesting -> {self.__nn.evaluate(X_test, y_test)}")
 
-    #def __pattern_removal(self, data: np.ndarray, entropy: float) -> np.ndarray:
-        """
-        The aim is to remove a pattern that need extra training in case of low probabilities class in case the node are
-        able to classify correctly.
-        This is a way to save time for training process, because if not done, it would require me to have extra hyperplanes
-        to classify correctly.
+        print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
-        IDEA (semplificazione):
-            * check if node have less or equal to certain entropy value
-            * remove the pattern labeled min_class
-
-        :param: data contain
-        :return: LTS without low probabilities pattern's class
-        """
-        """
-        classes, counts = np.unique(data[:, self.__num_features], return_counts=True)
-        min_class= list(sorted(zip(classes, counts)))[0][0]
-        
-        if entropy <= ENTROPY_TH: #and not self.__type == NodeType.LEAF:
-            self.__patterns = np.delete(self.__patterns, np.where(self.__patterns[self.__num_features] == min_class), 0)
-            self.__is_removed = True
-        
-        return data
-        """
+        return plot
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -320,7 +306,7 @@ class Node:
         if self.__type == NodeType.LEAF:
             return self.__label
         else:
-            if self.__nn.predict(X) >= 0.5:
+            if self.__nn.predict(X) >= self.__threshold:
                 return self.__childs[0].predict(X, verbose=verbose)
             else:
                 return self.__childs[1].predict(X, verbose=verbose)
