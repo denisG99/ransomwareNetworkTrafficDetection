@@ -51,6 +51,7 @@ def unzip_pcap(path, type, pswd = None):
                     shutil.copyfileobj(f_in, f_out)
                 except EOFError:
                     print("Qualcosa è andato storto")
+
 def main():
     feature_extract(ARCHIVE_PATH_GOODWARE, 'goodware')
 
