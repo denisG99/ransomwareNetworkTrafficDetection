@@ -1,12 +1,12 @@
-from dataclasses import dataclass, field
-
-import numpy as np
-
 from Node import Node
-from NodeType import NodeType
 from Classification import Classification
 
+from dataclasses import dataclass, field
+from typing import Any
+
 import pandas as pd
+import numpy as np
+import pickle as pkl
 
 @dataclass
 class NeuralTree:
@@ -33,21 +33,50 @@ class NeuralTree:
         self.__root = Node(data, data.shape[1] - 1)
         #self.__num_nodes += 1
 
-    def train(self, epochs: int, verbose: bool = False) -> None:
-            self.__root.train(epochs, self.__wait_epochs)
+    def train(self, epochs: int, verbose: int = 0) -> None:
+            self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
 
-    def make_prediction(self, sample: np.ndarray) -> Classification:
-        return self.__root.predict(sample.reshape((1, -1)))
+    def make_prediction(self, sample: np.ndarray, verbose: int = 0) -> Classification:
+        return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
+
+    def save_model(self) -> None:
+        """
+        This function save the model in pickel file format
+
+        :return: a pickel file contains the neural tree called 'model.pkl'
+        """
+        with open('model.pkl', 'wb') as file:
+            pkl.dump(self, file)
+
+        print("SALVATAGGIO COMPLETATO!")
+
+    def load_model(self, pkl_path: str) -> Any:
+        """
+        This function reload a model by pickel file
+
+        :param pkl_path: string containing pickle file path
+
+        :return: neural tree data structure that has been reload by pickle file
+        """
+        with open(pkl_path, 'rb') as file:
+            nt = pkl.load(file)
+
+        print("CARICAMENTO COMPLETATO!")
+
+        return nt
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+import time
+
 def main() -> None:
-    nt = NeuralTree("./toydata.csv")
+    start_time = time.time()
+    nt = NeuralTree("./toydata.csv", 5)
 
-    nt.train(250)
+    nt.train(250, verbose=0)
 
-    print(nt.make_prediction(np.array([0, 0])))
-
+    print(f"Time for training: {time.time() - start_time} secondi")
+    print(nt.make_prediction(np.array([0, 0]), verbose=0))
 
 if __name__ == "__main__":
     main()
