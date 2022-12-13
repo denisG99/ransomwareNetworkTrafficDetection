@@ -14,6 +14,7 @@ import Node
 
 import numpy as np
 import uuid
+import cv2 as cv
 
 ENTROPY_TH: float = 0.1 #TODO: da cambiare
 
@@ -59,6 +60,9 @@ class Node:
 
     def get_type(self) -> NodeType:
         return self.__type
+
+    def get_label(self):
+        return self.__label
 
 #-----------------------------------------------------------------------
 
@@ -328,6 +332,160 @@ class Node:
             else:
                 #return self.__childs[1].predict(X, verbose=verbose)
                 return self.__right.predict(X, verbose=verbose)
+
+    #TODO: refactoring della funzione in modo tale da farla più elegnate
+    def visualize_node(self, img, height: int, width: int, dim: int, is_left: bool = False, is_right: bool = False, level: int = 0) -> np.ndarray:
+        """
+        This function create a visualization of Node that follow these rules:
+            * white rectangle -> decision node
+            * blue rectangle -> split node
+            * red circle -> leaf node labeled as malware
+            * green circle -> leaf node labeled as benign
+
+        :param img: image
+        :param height: image height
+        :param width: image width
+        :param dim: for circle indicate radius instead for rectangle indicate length of square side
+        :param is_left: indicate if the node that I draw is left child
+        :param is_right: indicate if the node that I draw is right child
+        :param level: level of the tree (maintain the default value, otherwise it draws the tree lower in resulting image)
+        """
+        offset = 10
+        #offset used in drawing child
+        x_offset = (dim // 2)
+        y_offset = offset + dim + (dim // 2)
+
+        if not self.__left is None and not self.__right is None:
+            if self.get_type() == NodeType.LEAF:
+                if self.get_label() == Classification.MALWARE:
+                    if is_left and not is_right:
+                        img = cv.circle(img,  # image
+                                        (((width // 2) - (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
+                                        (dim // 2),  # radius
+                                        (0, 0, 255),  # color
+                                        -1)  # thickness
+                    elif is_right and not is_left:
+                        img = cv.circle(img,  # image
+                                        (((width // 2) + (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
+                                        (dim // 2),  # radius
+                                        (0, 0, 255),  # color
+                                        -1)  # thickness
+                    else:
+                        img = cv.circle(img,  # image
+                                        (width // 2, ((dim // 2) + offset)),  # center_coordinates
+                                        (dim // 2),  # radius
+                                        (0, 0, 255),  # color
+                                        -1)  # thickness
+                else:
+                    if is_left and not is_right:
+                         img = cv.circle(img, #image
+                                          (((width // 2) - (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
+                                          (dim // 2), #radius
+                                          (0, 255, 0), #color
+                                          -1) #thickness
+                    elif is_right and not is_left:
+                        img = cv.circle(img,  # image
+                                        (((width // 2) + (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
+                                        (dim // 2),  # radius
+                                        (0, 255, 0),  # color
+                                        -1)  # thicknessù
+                    else:
+                        img = cv.circle(img,  # image
+                                        (width // 2, ((dim // 2) + offset)),  # center_coordinates
+                                        (dim // 2),  # radius
+                                        (0, 255, 0),  # color
+                                        -1)  # thickness
+
+            elif self.get_type() == NodeType.DECISION:
+                if is_left and not is_right:
+                    img = cv.rectangle(img, #image
+                                        ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), #start_point
+                                        ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)), #end_point
+                                        (0, 0, 0), #color
+                                        2) #thickness
+                elif is_right and not is_left:
+                    img = cv.rectangle(img,  # image
+                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)),  # start_point
+                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
+                                       (0, 0, 0),  # color
+                                       2)  # thickness
+                else:
+                    img = cv.rectangle(img,  # image
+                                       ((width // 2) - (dim // 2), offset),  # start_point
+                                       ((width // 2) + (dim // 2), dim + offset),  # end_point
+                                       (0, 0, 0),  # color
+                                       2)  # thickness
+
+            elif self.get_type() == NodeType.SPLIT:
+                if is_left and not is_right:
+                    img = cv.rectangle(img,  # image
+                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), # start_point
+                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
+                                       (0, 0, 0),  # color
+                                       -1)  # thickness
+                elif is_right and not is_left:
+                    img = cv.rectangle(img,  # image
+                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), # start_point
+                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
+                                       (0, 0, 0),  # color
+                                       -1)  # thickness
+                else:
+                    img = cv.rectangle(img,  # image
+                                       ((width // 2) - (dim // 2), offset),  # start_point
+                                       ((width // 2) + (dim // 2), dim + offset),  # end_point
+                                       (0, 0, 0),  # color
+                                       -1)  # thickness
+
+            if is_left and not is_right:
+                #draw left child line
+                img = cv.line(img, #image
+                               ((width // 2) - (x_offset * level), offset + dim + (y_offset * level)), #start_point
+                               ((width // 2) - (dim // 2) - (x_offset * level), offset + dim + (dim // 2) + (y_offset * level)), #end point
+                               (0, 0, 0), #color
+                               2) #thickness
+
+                #draw right child line
+                img = cv.line(img,  # image
+                              ((width // 2) - (x_offset * level), offset + dim + (y_offset * level)),  # start_point
+                              ((width // 2) + (dim // 2) - (x_offset * level), offset + (dim // 2) + dim + (y_offset * level)), #end_point
+                              (0, 0, 0),  # color
+                              2)  # thickness
+            elif is_right and not is_left:
+                # draw left child line
+                img = cv.line(img,  # image
+                              ((width // 2) + (x_offset * level), offset + dim + (y_offset * level)),  # start_point
+                              ((width // 2) + (dim // 2) + (x_offset * level), offset + dim + (dim // 2) + (y_offset * level)),
+                              # ((width // 2), dim + offset ), #end_point
+                              (0, 0, 0),  # color
+                              2)  # thickness
+
+                # draw right child line
+                img = cv.line(img,  # image
+                              ((width // 2) + (x_offset * level), offset + dim + (y_offset * level)),  # start_point
+                              ((width // 2) + (dim // 2) + (x_offset * level), offset + (dim // 2) + dim + (y_offset * level)),  # end_point
+                              (0, 0, 0),  # color
+                              2)  # thickness
+            else:
+                # draw left child line
+                img = cv.line(img,  # image
+                              ((width // 2), offset + dim),  # start_point
+                              ((width // 2) - (dim // 2), offset + dim + (dim // 2)),
+                              # ((width // 2), dim + offset ), #end_point
+                              (0, 0, 0),  # color
+                              2)  # thickness
+
+                # draw right child line
+                img = cv.line(img,  # image
+                              ((width // 2), offset + dim),  # start_point
+                              ((width // 2) + (dim // 2), offset + (dim // 2) + dim),  # end_point
+                              (0, 0, 0),  # color
+                              2)  # thickness
+
+            level += 1
+            #img = self.__left.visualize_node(img, height, width, dim, is_left=True, is_right=False, level=level)
+            img= self.__right.visualize_node(img, height, width, dim, is_left=False, is_right=True, level=level)
+
+        return img
 
 #-----------------------------------------------------------------------------------------------------------------------
 

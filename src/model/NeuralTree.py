@@ -1,5 +1,6 @@
 from Node import Node
 from Classification import Classification
+from NodeType import NodeType
 
 from dataclasses import dataclass, field
 from typing import Any
@@ -7,6 +8,7 @@ from typing import Any
 import pandas as pd
 import numpy as np
 import pickle as pkl
+import cv2 as cv
 
 @dataclass
 class NeuralTree:
@@ -75,6 +77,26 @@ class NeuralTree:
 
         return nt
 
+    def visualize(self, height: int, width: int) -> None:
+        """
+        This function create a visualization of the Neural Tree that follow these rules:
+            * white square -> decision node
+            * blue square -> split node
+            * red circle -> leaf node labeled as malware
+            * green circle -> leaf node labeled as benign
+
+        :param height: image height
+        :param width: image width
+        :return: visualization of the Neural Tree
+        """
+        img = np.full((height, width, 3), 255, dtype='uint8')
+
+        cv.imshow("Neural Tree visualization", self.__root.visualize_node(img, height, width, 40))
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 import time
@@ -86,12 +108,13 @@ def main() -> None:
     nt.train(250, verbose=0)
 
     print(f"Time for training: {time.time() - start_time} secondi")
-    print(nt.make_predictions(np.array([0, 0]), verbose=0))
+    #print(nt.make_predictions(np.array([0, 0]), verbose=0))
 
     #VALUTAZIONE MODELLO
-    data = pd.read_csv("./toydata.csv", header=None).to_numpy()
+    #data = pd.read_csv("./toydata.csv", header=None).to_numpy()
 
-    print(f"Precision: {nt.evaluate(data[:, 0 : 2], data[:, 2], verbose=0)}%")
+    #print(f"Precision: {nt.evaluate(data[:, 0 : 2], data[:, 2], verbose=0)}%")
+    nt.visualize(1080, 1920)
 
 if __name__ == "__main__":
     main()
