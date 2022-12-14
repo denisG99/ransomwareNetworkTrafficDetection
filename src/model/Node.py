@@ -334,6 +334,7 @@ class Node:
                 return self.__right.predict(X, verbose=verbose)
 
     #TODO: refactoring della funzione in modo tale da farla più elegnate
+    #FUNCTION DOESN'T WORK
     def visualize_node(self, img, height: int, width: int, dim: int, is_left: bool = False, is_right: bool = False, level: int = 0) -> np.ndarray:
         """
         This function create a visualization of Node that follow these rules:

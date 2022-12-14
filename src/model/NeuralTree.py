@@ -51,13 +51,13 @@ class NeuralTree:
 
         return (np.sum(y==predictions) / predictions.shape[0]) * 100
 
-    def save_model(self) -> None:
+    def save_model(self, path: str) -> None:
         """
         This function save the model in pickel file format
 
         :return: a pickel file contains the neural tree called 'model.pkl'
         """
-        with open('model.pkl', 'wb') as file:
+        with open(path, 'wb') as file:
             pkl.dump(self, file)
 
         print("SALVATAGGIO COMPLETATO!")
