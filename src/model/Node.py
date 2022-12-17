@@ -111,10 +111,10 @@ class Node:
             #TODO da togliere la divisione in train e test set
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
-            X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
+            #X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
             #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs, verbose=verbose)
+            effective_epochs, weights = self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
 
             #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
              #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
