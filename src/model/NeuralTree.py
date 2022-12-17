@@ -1,6 +1,5 @@
 from Node import Node
 from Classification import Classification
-from NodeType import NodeType
 
 from dataclasses import dataclass, field
 from typing import Any
@@ -62,7 +61,8 @@ class NeuralTree:
 
         print("SALVATAGGIO COMPLETATO!")
 
-    def load_model(self, pkl_path: str) -> Any:
+    @staticmethod
+    def load_model(pkl_path: str) -> Any:
         """
         This function reload a model by pickel file
 
