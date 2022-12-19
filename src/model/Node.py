@@ -111,10 +111,10 @@ class Node:
             #TODO da togliere la divisione in train e test set
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
-            X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
+            #X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
             #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs, weights = self.__nn.fit(X_train, y_train, epochs, wait_epochs, verbose=verbose)
+            effective_epochs, weights = self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
 
             #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
              #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
@@ -158,9 +158,9 @@ class Node:
 
             #print(f"END TRAINING Node {self.__id}")
 
-            print(f"VALUTAZIONE NODO {self.__id}")
-            print(f"\tTraining -> {self.__nn.evaluate(X_train, y_train)}")
-            print(f"\tTesting -> {self.__nn.evaluate(X_test, y_test)}")
+            #print(f"VALUTAZIONE NODO {self.__id}")
+            #print(f"\tTraining -> {self.__nn.evaluate(X_train, y_train)}")
+            #print(f"\tTesting -> {self.__nn.evaluate(X_test, y_test)}")
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
@@ -489,7 +489,7 @@ class Node:
         return img
 
 #-----------------------------------------------------------------------------------------------------------------------
-
+"""
 def main() -> None:
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -523,7 +523,6 @@ def main() -> None:
     #x = np.linspace(-3, 3, 10)
 
     #plotting
-    """
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')
     plt.scatter(X[y == 1, 0], X[y == 1, 1], label='class 1', marker='s')
     plt.title('Dataset')
@@ -538,16 +537,16 @@ def main() -> None:
     #plt.plot(x, -((split_rule[0] * x - split_rule[2]) / split_rule[1]), '-r')
     plt.legend()
     plt.show()
-    """
+    
     #print(root)
     print(root.predict(np.zeros(40).reshape((1, -1))))
-    """
+    
     lts0, lts1 = root.dataset_split(patterns, X)
     #root.dataset_split(patterns, X)
-    """
+    
     #X0, y0, X1, y1 = lts0[:, :2], lts0[:, 2], lts1[:, :2], lts1[:, 2]
 
-    """
+    
     plt.scatter(X0[y0 == 0, 0], X0[y0 == 0, 1], label='class 0', marker='o')
     plt.scatter(X0[y0 == 1, 0], X0[y0 == 1, 1], label='class 1', marker='s')
     plt.title('LTS_0')
@@ -567,7 +566,8 @@ def main() -> None:
     plt.ylim([-3, 3])
     plt.legend()
     plt.show()
-    """
+    
 
 if __name__ == "__main__":
     main()
+"""

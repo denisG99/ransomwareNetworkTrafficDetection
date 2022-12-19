@@ -45,11 +45,11 @@ class NeuralNetwork:
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=verbose)]
+        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=1)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
-        hystory = self.__model.fit(X, y, epochs=epochs, batch_size=1, verbose=verbose, validation_split=0, callbacks=callbacks)
+        hystory = self.__model.fit(X, y, epochs=epochs, batch_size=None, verbose=verbose, validation_split=0, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -96,7 +96,7 @@ class NeuralNetwork:
         return self.__model.get_weights()
 
 #-----------------------------------------------------------------------------------------------------------------------
-
+"""
 def main() -> None:
     import pandas as pd
     from sklearn.datasets import make_classification
@@ -142,3 +142,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+"""

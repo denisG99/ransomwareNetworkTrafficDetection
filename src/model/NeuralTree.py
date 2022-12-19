@@ -1,6 +1,5 @@
 from Node import Node
 from Classification import Classification
-from NodeType import NodeType
 
 from dataclasses import dataclass, field
 from typing import Any
@@ -18,7 +17,7 @@ class NeuralTree:
                    __wait_epochs = 0)
         """
     __root : Node = field(init=False)
-    __data_path : str
+    __data_path : str = field(repr=False)
     #TREE STATISTICS
     """
     __depth: int = 0 #depth of tree
@@ -62,7 +61,8 @@ class NeuralTree:
 
         print("SALVATAGGIO COMPLETATO!")
 
-    def load_model(self, pkl_path: str) -> Any:
+    @staticmethod
+    def load_model(pkl_path: str) -> Any:
         """
         This function reload a model by pickel file
 
@@ -98,7 +98,7 @@ class NeuralTree:
 
 
 #-----------------------------------------------------------------------------------------------------------------------
-
+"""
 import time
 
 def main() -> None:
@@ -111,10 +111,11 @@ def main() -> None:
     #print(nt.make_predictions(np.array([0, 0]), verbose=0))
 
     #VALUTAZIONE MODELLO
-    #data = pd.read_csv("./toydata.csv", header=None).to_numpy()
+    data = pd.read_csv("./toydata.csv", header=None).to_numpy()
 
-    #print(f"Precision: {nt.evaluate(data[:, 0 : 2], data[:, 2], verbose=0)}%")
-    nt.visualize(1080, 1920)
+    print(f"Precision: {nt.evaluate(data[:, 0 : 2], data[:, 2], verbose=0)}%")
+    #nt.visualize(1080, 1920)
 
 if __name__ == "__main__":
     main()
+"""
