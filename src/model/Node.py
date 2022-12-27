@@ -130,6 +130,8 @@ class Node:
                 #print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
+            del self.__patterns #FIX for momory issues
+
             #goodware_lts = self.__pattern_removal(goodware_lts)
             #malware_lts= self.__pattern_removal(malware_lts)
             #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
@@ -306,7 +308,7 @@ class Node:
         for pattern, row in zip(X, lts):
             #print(pattern)
             #print(row)
-            if self.__nn.predict(pattern.reshape(1, -1), verbose=verbose) >= 0.5:
+            if self.__nn.predict(pattern.reshape(1, -1), verbose=0) >= 0.5:
                 lts1 = np.append(lts1, row)
             else:
                 lts0 = np.append(lts0, row)
@@ -489,7 +491,7 @@ class Node:
         return img
 
 #-----------------------------------------------------------------------------------------------------------------------
-"""
+
 def main() -> None:
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -541,12 +543,13 @@ def main() -> None:
     #print(root)
     print(root.predict(np.zeros(40).reshape((1, -1))))
     
-    lts0, lts1 = root.dataset_split(patterns, X)
+    #lts0, lts1 = root.dataset_split(patterns, X)
     #root.dataset_split(patterns, X)
     
     #X0, y0, X1, y1 = lts0[:, :2], lts0[:, 2], lts1[:, :2], lts1[:, 2]
 
     
+    """
     plt.scatter(X0[y0 == 0, 0], X0[y0 == 0, 1], label='class 0', marker='o')
     plt.scatter(X0[y0 == 1, 0], X0[y0 == 1, 1], label='class 1', marker='s')
     plt.title('LTS_0')
@@ -566,8 +569,7 @@ def main() -> None:
     plt.ylim([-3, 3])
     plt.legend()
     plt.show()
-    
+    """
 
 if __name__ == "__main__":
     main()
-"""

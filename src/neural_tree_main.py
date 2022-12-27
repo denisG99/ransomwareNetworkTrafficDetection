@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath('./model'))
+
 import time
 from model.NeuralTree import NeuralTree
 
@@ -15,7 +19,7 @@ def main():
         start_time = time.time()
 
         print("INIZIO ADDESTRAMENTO NEURAL TREE")
-        nt.train(250, 1)#fit(X_train_balanced, y_train_balanced)
+        nt.train(250, 1)
 
         print(f"L'addestramento della bayesian network ha impiegato {time.time() - start_time} secondi")
 
