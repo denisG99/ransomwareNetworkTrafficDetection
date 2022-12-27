@@ -49,7 +49,7 @@ class NeuralNetwork:
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
-        hystory = self.__model.fit(X, y, epochs=epochs, batch_size=None, verbose=verbose, validation_split=0, callbacks=callbacks)
+        hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
