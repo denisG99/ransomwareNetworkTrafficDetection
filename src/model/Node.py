@@ -305,13 +305,20 @@ class Node:
         lts0 = np.array([])
         lts1 = np.array([])
 
-        for pattern, row in zip(X, lts):
+        preds = self.__nn.predict(X, verbose=1)
+        status = 1
+        #print(preds)
+
+        for pred, pattern, row in zip(preds, X, lts):
             #print(pattern)
             #print(row)
-            if self.__nn.predict(pattern.reshape(1, -1), verbose=0) >= 0.5:
+            print(f"{status}/{preds.shape[0]}")
+            if pred >= 0.5:
                 lts1 = np.append(lts1, row)
             else:
                 lts0 = np.append(lts0, row)
+
+            status += 1
 
         lts0 = np.resize(lts0, (int(len(lts0) / (self.__num_features + 1)), self.__num_features + 1))
         lts1 = np.resize(lts1, (int(len(lts1) / (self.__num_features + 1)), self.__num_features + 1))
@@ -501,23 +508,30 @@ def main() -> None:
     import numpy as np
 
 
-    #patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
+    patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
     #print(patterns.shape)
     #X, y = make_moons(100)
-    X, y = make_classification(10000, 40, n_classes=2)
+    #X, y = make_classification(10000, 40, n_classes=2)
 
 
     #print(X)
-    y= np.reshape(y, (10000, 1))
-    patterns = np.append(X, y, axis=1)
+    #y= np.reshape(y, (10000, 1))
+
+    X_train, X_test, y_train, y_test = train_test_split(patterns[:, :2], patterns[:, 2], test_size=.3, train_size=.7)
+
+    patterns = np.append(X_train, np.reshape(y_train, (-1, 1)), axis=1)
 
     root = Node(patterns, patterns.shape[1] - 1)
-    #X, y = patterns[:, :2], patterns[:, 2]
     #X, y = patterns[0], patterns[1]
 
     root.train(250, 5, plt.plot())
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
+
+    #lts0, lts1 = root.dataset_split(patterns, X_train)
+
+    #print(lts0)
+    #print(lts1)
 
     #print(centroids)
     #split_rule = root.split_hyperplane(centroids, center)
@@ -525,6 +539,7 @@ def main() -> None:
     #x = np.linspace(-3, 3, 10)
 
     #plotting
+    """
     plt.scatter(X[y == 0, 0], X[y == 0, 1], label='class 0', marker='o')
     plt.scatter(X[y == 1, 0], X[y == 1, 1], label='class 1', marker='s')
     plt.title('Dataset')
@@ -548,8 +563,6 @@ def main() -> None:
     
     #X0, y0, X1, y1 = lts0[:, :2], lts0[:, 2], lts1[:, :2], lts1[:, 2]
 
-    
-    """
     plt.scatter(X0[y0 == 0, 0], X0[y0 == 0, 1], label='class 0', marker='o')
     plt.scatter(X0[y0 == 1, 0], X0[y0 == 1, 1], label='class 1', marker='s')
     plt.title('LTS_0')
