@@ -68,7 +68,7 @@ class NeuralNetwork:
             #print(f'\tN_weigth update: {model.t_}')
         return hystory, self.__model.weights
 
-    def predict(self, X: np.ndarray, verbose: int = 0) -> float:
+    def predict(self, X: np.ndarray, verbose: int = 0) -> np.ndarray:
         #prediction = self.__model.predict(X, batch_size=1, verbose=0)
         #for perceptron in self.__perceptrons:
          #   output = perceptron.predict(X)
