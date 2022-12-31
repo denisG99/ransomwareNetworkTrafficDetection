@@ -96,16 +96,16 @@ class NeuralNetwork:
         return self.__model.get_weights()
 
 #-----------------------------------------------------------------------------------------------------------------------
-"""
+
 def main() -> None:
     import pandas as pd
-    from sklearn.datasets import make_classification
+    #from sklearn.datasets import make_classification
 
-    #toy = pd.read_csv("toydata.csv").to_numpy()
-    toy = make_classification(10000, 40, n_classes=2)
+    toy = pd.read_csv("toydata.csv").to_numpy()
+    #toy = make_classification(10000, 40, n_classes=2)
 
-    X, y = toy[0], toy[1]
-    #X, y = toy[:, :toy.shape[1]], toy[:, toy.shape[1]]
+    #X, y = toy[0], toy[1]
+    X, y = toy[:, :2], toy[:, 2]
 
     shuffle_idx = np.arange(y.shape[0])
     shuffle_rng = np.random.RandomState(123)
@@ -126,8 +126,10 @@ def main() -> None:
 
     #print(nn.predict(X_test))
 
-    print(f"Training -> {nn.evaluate(X_train, y_train)}")
-    print(f"Testing -> {nn.evaluate(X_test, y_test)}")
+    #print(f"Training -> {nn.evaluate(X_train, y_train)}")
+    #print(f"Testing -> {nn.evaluate(X_test, y_test)}")
+
+    print(nn.get_weight()[0])
     #print(statistics.history['loss'])
 
     #for pattern, expected_y in zip(X_test, y_test):
@@ -143,4 +145,3 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-"""
