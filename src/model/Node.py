@@ -15,7 +15,7 @@ import Node
 
 import numpy as np
 import uuid
-import cv2 as cv
+#import cv2 as cv
 
 ENTROPY_TH: float = 0.1 #TODO: da cambiare
 
@@ -103,83 +103,47 @@ class Node:
         return entropy(probs, base=2), dict(zip(labels, counts))
 
 
-    def train(self, epochs: int, wait_epochs: int, plot = None, verbose: int = 0) -> None:
+    def train(self, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
         if not self.__type == NodeType.LEAF:
-            #TODO da togliere la divisione in train e test set
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
             target = self.__patterns[:, self.__num_features]  # labels dataset
-            #X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=.2,train_size=.8)  # dataset split with 80-20 splitting rule
-            #classes, counts = np.unique(target, return_counts=True)
 
-            effective_epochs, weights = self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
-
-            #plt.plot([-3, 3], [((-(weights[0][0] * (-3) + weights[1][0])) / weights[0][1]),
-             #                      ((-(weights[0][0] * 3 + weights[1][0])) / weights[0][1])])
-            #self.__nn.evaluate(X_train, y_train, "Train accuracy")
-            #self.__nn.evaluate(X_test, y_test, "Test accuracy")
+            self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
 
             #DATASET SPLITTING
             #split based on perceptron substitutions
             preds = self.__nn.predict(data, verbose=verbose)
 
-            if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
-                #compute centroid of the local training set
-                centroid = self.__get_centroid(data)
+            if not len(np.unique(preds)) == 1:
+                if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
+                    #compute centroid of the local training set
+                    centroid = self.__get_centroid(data)
 
-                #compute the new hyperplane passing throw centroid
-                hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
-                self.__nn.reinit_weights(hyperplane)
+                    #compute the new hyperplane passing throw centroid
+                    hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
+                    self.__nn.reinit_weights(hyperplane)
 
-                self.__type = NodeType.SUBSTITUTION
+                    self.__type = NodeType.SUBSTITUTION
 
-            lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
+                lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
 
             #split based on split node
-            if not np.any(lts0) or not np.any(lts1):
-                #print("Creazione split rule")
+            else:
+                print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
-
-
             del self.__patterns #FIX for momory issues
-
-            #goodware_lts = self.__pattern_removal(goodware_lts)
-            #malware_lts= self.__pattern_removal(malware_lts)
-            #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
-             #                                         Node(lts0, self.__num_features)])
 
             #CHILD CREATION + TRAINING
             self.__left = Node(lts1, self.__num_features)
             self.__right = Node(lts0, self.__num_features)
 
-            #print(f"\tNode {self.__id} is {self.__type} Node (Label -> {self.__label})")
+            self.__left.train(epochs, wait_epochs, verbose=verbose)
+            self.__right.train(epochs, wait_epochs, verbose=verbose)
 
-            #else:
-             #   lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data)
-
-                #lts0 = self.__pattern_removal(lts0)
-                #lts1 = self.__pattern_removal(lts1)
-
-                #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
-                 #                                         Node(lts0, self.__num_features)])
-
-            #print(goodware_lts)
-            #print(malware_lts)
-
-            #for child in self.__childs:
-                #child.train(epochs, wait_epochs, plot, verbose=verbose)
-            self.__left.train(epochs, wait_epochs, plot, verbose=verbose)
-            self.__right.train(epochs, wait_epochs, plot, verbose=verbose)
-
-            #print(f"END TRAINING Node {self.__id}")
-
-            #print(f"VALUTAZIONE NODO {self.__id}")
-            #print(f"\tTraining -> {self.__nn.evaluate(X_train, y_train)}")
-            #print(f"\tTesting -> {self.__nn.evaluate(X_test, y_test)}")
+            print(f"END TRAINING Node {self.__id}")
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
-
-        return plot
 
     def __is_acceptable(self, y_true: np.ndarray, y_pred) -> bool:
         """
@@ -203,7 +167,7 @@ class Node:
         :return: true if the two partitions are almost balanced, otherwise
         """
        #TODO: da implementare
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel(order='')
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
 
         K_c = tn + tp
         K_t = y_true.shape[0]
@@ -219,7 +183,7 @@ class Node:
         E_max, E_min = np.max(E_i), np.min(E_i)
 
 
-        return (E_t <= E_0 / 2) and (E_max - E_min <= E_t)
+        return (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t)
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
@@ -354,13 +318,16 @@ class Node:
 
         :return: return an arrays containig the two dataset split
         """
-        lts0 = np.array([])
-        lts1 = np.array([])
+        #lts0 = np.array([])
+        #lts1 = np.array([])
 
-        preds = self.__nn.predict(X, verbose=1)
-        status = 1
+        preds = self.__nn.predict(X, verbose=verbose)
+        #status = 1
         #print(preds)
 
+        data = np.append(lts, preds, axis=1)
+
+        """
         for pred, row in zip(preds, lts):
             #print(pattern)
             #print(row)
@@ -371,9 +338,11 @@ class Node:
                 lts0 = np.append(lts0, row)
 
             status += 1
-
-        lts0 = np.resize(lts0, (int(len(lts0) / (self.__num_features + 1)), self.__num_features + 1))
-        lts1 = np.resize(lts1, (int(len(lts1) / (self.__num_features + 1)), self.__num_features + 1))
+        """
+        lts0 = lts[np.where(data[:, data.shape[1] - 1] == 0)]
+        lts1 = lts[np.where(data[:, data.shape[1] - 1] == 1)]
+        #lts0 = np.resize(lts0, (int(len(lts0) / (self.__num_features + 1)), self.__num_features + 1))
+        #lts1 = np.resize(lts1, (int(len(lts1) / (self.__num_features + 1)), self.__num_features + 1))
 
         #print(lts0)
         #print(lts1)
@@ -396,7 +365,7 @@ class Node:
 
     #TODO: refactoring della funzione in modo tale da farla più elegnate
     #FUNCTION DOESN'T WORK
-    def visualize_node(self, img, height: int, width: int, dim: int, is_left: bool = False, is_right: bool = False, level: int = 0) -> np.ndarray:
+   # def visualize_node(self, img, height: int, width: int, dim: int, is_left: bool = False, is_right: bool = False, level: int = 0) -> np.ndarray:
         """
         This function create a visualization of Node that follow these rules:
             * white rectangle -> decision node
@@ -411,6 +380,7 @@ class Node:
         :param is_left: indicate if the node that I draw is left child
         :param is_right: indicate if the node that I draw is right child
         :param level: level of the tree (maintain the default value, otherwise it draws the tree lower in resulting image)
+        """
         """
         offset = 10
         #offset used in drawing child
@@ -548,7 +518,7 @@ class Node:
             img= self.__right.visualize_node(img, height, width, dim, is_left=False, is_right=True, level=level)
 
         return img
-
+    """
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
@@ -560,7 +530,7 @@ def main() -> None:
     import numpy as np
 
 
-    patterns = pd.read_csv("toydata.csv", header=None).to_numpy()
+    patterns = pd.read_csv("../../csv/train.csv").to_numpy()
     #print(patterns.shape)
     #X, y = make_moons(100)
     #X, y = make_classification(10000, 40, n_classes=2)
@@ -569,21 +539,21 @@ def main() -> None:
     #print(X)
     #y= np.reshape(y, (10000, 1))
 
-    X_train, X_test, y_train, y_test = train_test_split(patterns[:, :2], patterns[:, 2], test_size=.3, train_size=.7)
+    #X_train, X_test, y_train, y_test = train_test_split(patterns[:, :2], patterns[:, 2], test_size=.3, train_size=.7)
 
-    patterns = np.append(X_train, np.reshape(y_train, (-1, 1)), axis=1)
+    #patterns = np.append(X_train, np.reshape(y_train, (-1, 1)), axis=1)
 
     root = Node(patterns, patterns.shape[1] - 1)
     #X, y = patterns[0], patterns[1]
 
-    root.train(250, 5, plt.plot())
+    root.train(250, 5, verbose=1)
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
-    #lts0, lts1 = root.dataset_split(patterns, X_train)
+    lts0, lts1 = root.__dataset_split(patterns, patterns[:, 0: patterns.shape[1] - 1])
 
-    #print(lts0)
-    #print(lts1)
+    print(lts0)
+    print(lts1)
 
     #print(centroids)
     #split_rule = root.split_hyperplane(centroids, center)
