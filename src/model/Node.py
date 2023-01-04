@@ -127,8 +127,7 @@ class Node:
 
                 lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
 
-            #split based on split node
-            else:
+            else: #split based on split node
                 print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
