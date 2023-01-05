@@ -23,8 +23,8 @@ def main():
 
         print(f"L'addestramento della bayesian network ha impiegato {time.time() - start_time} secondi")
 
-        print("SALVATAGGIO MODELLO IN ../exported_model/nt_unbalance.pkl")
-        nt.save_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
+        #print("SALVATAGGIO MODELLO IN ../exported_model/nt_unbalance.pkl")
+        #nt.save_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
 
 if __name__ == "__main__":
     main()

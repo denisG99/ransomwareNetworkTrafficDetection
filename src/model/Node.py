@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Tuple, Union, Dict, Any, Iterable
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 from scipy.stats import entropy
 
 from matplotlib import pyplot as plt
@@ -103,10 +104,6 @@ class Node:
 
 
     def train(self, epochs: int, wait_epochs: int, plot = None, verbose: int = 0) -> None:
-        #print(self.__patterns)
-        #print(self.__type)
-        #print(f"START TRAINING Node {self.__id}")
-
         if not self.__type == NodeType.LEAF:
             #TODO da togliere la divisione in train e test set
             data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
@@ -121,14 +118,28 @@ class Node:
             #self.__nn.evaluate(X_train, y_train, "Train accuracy")
             #self.__nn.evaluate(X_test, y_test, "Test accuracy")
 
+            #DATASET SPLITTING
+            #split based on perceptron substitutions
+            preds = self.__nn.predict(data, verbose=verbose)
+
+            if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
+                #compute centroid of the local training set
+                centroid = self.__get_centroid(data)
+
+                #compute the new hyperplane passing throw centroid
+                hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
+                self.__nn.reinit_weights(hyperplane)
+
+                self.__type = NodeType.SUBSTITUTION
+
             lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
 
-            #print(np.any(lts0))
-            #print(np.any(lts1))
-
+            #split based on split node
             if not np.any(lts0) or not np.any(lts1):
                 #print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
+
+
 
             del self.__patterns #FIX for momory issues
 
@@ -136,6 +147,8 @@ class Node:
             #malware_lts= self.__pattern_removal(malware_lts)
             #self.__childs = np.append(self.__childs, [Node(lts1, self.__num_features),
              #                                         Node(lts0, self.__num_features)])
+
+            #CHILD CREATION + TRAINING
             self.__left = Node(lts1, self.__num_features)
             self.__right = Node(lts0, self.__num_features)
 
@@ -168,7 +181,46 @@ class Node:
 
         return plot
 
-    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
+    def __is_acceptable(self, y_true: np.ndarray, y_pred) -> bool:
+        """
+        This function check if the training of the perceptron is considered acceptable. To do this I have to check the follow condition:
+            E_t <= E_0 / 2 and (E_max - E_min) <= E_t
+
+            E_t = 1 - Kc/kt, where Kc is number of correctly classified pattern and Kt is the total number of pattern into node
+            E_0 -> QUAL'È?
+            E_max = max{E_i}
+            E_min = min{E_i}
+            E_i = 1 - K_ci / K_ti, where K_ci is number of correctly classified pattern of class i and K_ti is total number of pattern classified as class i
+
+        For calculate that value we will use a confusion matrix(cm) in fact:
+            * Kc -> sum of the diagonal
+            * K_ci -> cm[i][i]
+            * K_ti -> sum of i-th row
+
+        :param y_true: array containing label
+        :param y_pred: array containing predicted label
+
+        :return: true if the two partitions are almost balanced, otherwise
+        """
+       #TODO: da implementare
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel(order='')
+
+        K_c = tn + tp
+        K_t = y_true.shape[0]
+        E_t = 1 - (K_c / K_t)
+
+        E_0 = 0 #TODO: da capire come calcolarlo
+
+        K_ci = np.array([tp, tn])
+        K_ti = np.array([tp + fp, tn + fn])
+
+        E_i = 1 - np.divide(K_ci, K_ti)
+
+        E_max, E_min = np.max(E_i), np.min(E_i)
+
+
+        return (E_t <= E_0 / 2) and (E_max - E_min <= E_t)
+    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
 
@@ -309,7 +361,7 @@ class Node:
         status = 1
         #print(preds)
 
-        for pred, pattern, row in zip(preds, X, lts):
+        for pred, row in zip(preds, lts):
             #print(pattern)
             #print(row)
             print(f"{status}/{preds.shape[0]}")

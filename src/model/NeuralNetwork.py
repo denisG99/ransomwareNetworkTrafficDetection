@@ -45,11 +45,12 @@ class NeuralNetwork:
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=1)]
+        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
-        hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0, callbacks=callbacks)
+        #hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
+        self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -66,7 +67,7 @@ class NeuralNetwork:
         #print(f'\tBias: {self.__model.get_bias()}\n')
             #print(f'\tN_iter: {model.n_iter_}')
             #print(f'\tN_weigth update: {model.t_}')
-        return hystory, self.__model.weights
+        #return hystory, self.__model.weights
 
     def predict(self, X: np.ndarray, verbose: int = 0) -> np.ndarray:
         #prediction = self.__model.predict(X, batch_size=1, verbose=0)
@@ -96,16 +97,16 @@ class NeuralNetwork:
         return self.__model.get_weights()
 
 #-----------------------------------------------------------------------------------------------------------------------
-"""
+
 def main() -> None:
     import pandas as pd
-    from sklearn.datasets import make_classification
+    #from sklearn.datasets import make_classification
 
-    #toy = pd.read_csv("toydata.csv").to_numpy()
-    toy = make_classification(10000, 40, n_classes=2)
+    toy = pd.read_csv("toydata.csv").to_numpy()
+    #toy = make_classification(10000, 40, n_classes=2)
 
-    X, y = toy[0], toy[1]
-    #X, y = toy[:, :toy.shape[1]], toy[:, toy.shape[1]]
+    #X, y = toy[0], toy[1]
+    X, y = toy[:, :2], toy[:, 2]
 
     shuffle_idx = np.arange(y.shape[0])
     shuffle_rng = np.random.RandomState(123)
@@ -122,12 +123,14 @@ def main() -> None:
 
     nn = NeuralNetwork(X.shape[1])
 
-    statistics = nn.fit(X_train, y_train, 500, 5)
+    nn.fit(X_train, y_train, 500, 5)
 
     #print(nn.predict(X_test))
 
-    print(f"Training -> {nn.evaluate(X_train, y_train)}")
-    print(f"Testing -> {nn.evaluate(X_test, y_test)}")
+    #print(f"Training -> {nn.evaluate(X_train, y_train)}")
+    #print(f"Testing -> {nn.evaluate(X_test, y_test)}")
+
+    print(nn.get_weight()[0])
     #print(statistics.history['loss'])
 
     #for pattern, expected_y in zip(X_test, y_test):
@@ -143,4 +146,3 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-"""
