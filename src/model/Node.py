@@ -549,10 +549,10 @@ def main() -> None:
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
-    lts0, lts1 = root.__dataset_split(patterns, patterns[:, 0: patterns.shape[1] - 1])
+    #lts0, lts1 = root.dataset_split(patterns, patterns[:, 0: patterns.shape[1] - 1])
 
-    print(lts0)
-    print(lts1)
+    #print(lts0)
+    #print(lts1)
 
     #print(centroids)
     #split_rule = root.split_hyperplane(centroids, center)
