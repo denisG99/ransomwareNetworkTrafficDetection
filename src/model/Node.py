@@ -183,7 +183,7 @@ class Node:
 
 
         return (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t)
-    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
+    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
 
