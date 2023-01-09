@@ -115,6 +115,7 @@ class Node:
             preds = self.__nn.predict(data, verbose=verbose)
 
             if not len(np.unique(preds)) == 1:
+                """
                 if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
                     #compute centroid of the local training set
                     centroid = self.__get_centroid(data)
@@ -124,6 +125,7 @@ class Node:
                     self.__nn.reinit_weights(hyperplane)
 
                     self.__type = NodeType.SUBSTITUTION
+                """
 
                 lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
 
@@ -132,6 +134,11 @@ class Node:
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
             del self.__patterns #FIX for momory issues
+
+            print("lts1")
+            print(np.unique(lts1[:, self.__num_features], return_counts=True))
+            print("lts0")
+            print(np.unique(lts0[:, self.__num_features], return_counts=True))
 
             #CHILD CREATION + TRAINING
             self.__left = Node(lts1, self.__num_features)
