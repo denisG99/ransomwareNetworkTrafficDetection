@@ -87,8 +87,7 @@ class NeuralNetwork:
         return self.__model.evaluate(X, y, return_dict=True)
 
     def reinit_weights(self, weights: np.ndarray):
-        #weights = [list(x) for x in weights]
-        bias = np.array([weights[self.__num_input_features]])
+        bias = np.array([weights[self.__num_input_features - 1]])
         weights = weights[: self.__num_input_features].reshape((self.__num_input_features, 1))
 
         self.__model.set_weights([weights[: self.__num_input_features], bias])
@@ -124,14 +123,21 @@ def main() -> None:
     nn = NeuralNetwork(X.shape[1])
 
     nn.fit(X_train, y_train, 500, 5)
-
     #print(nn.predict(X_test))
 
     #print(f"Training -> {nn.evaluate(X_train, y_train)}")
     #print(f"Testing -> {nn.evaluate(X_test, y_test)}")
 
+
+    print(nn.get_weight())
     print(nn.get_weight()[0])
+    print(nn.get_weight()[1])
+
+    nn.reinit_weights(np.zeros(X.shape[1]))
     #print(statistics.history['loss'])
+    print(nn.get_weight())
+    print(nn.get_weight()[0])
+    print(nn.get_weight()[1])
 
     #for pattern, expected_y in zip(X_test, y_test):
      #   print(f"{nn.predict(pattern.reshape(1, -1))} -> {expected_y}")

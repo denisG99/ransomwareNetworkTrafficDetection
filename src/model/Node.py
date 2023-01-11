@@ -115,30 +115,17 @@ class Node:
             preds = self.__nn.predict(data, verbose=verbose)
 
             if not len(np.unique(preds)) == 1:
-                """
-                if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
-                    #compute centroid of the local training set
-                    centroid = self.__get_centroid(data)
-
-                    #compute the new hyperplane passing throw centroid
-                    hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
-                    self.__nn.reinit_weights(hyperplane)
-
-                    self.__type = NodeType.SUBSTITUTION
-                """
+                self.__make_acceptable_model(target, preds) #create trained perceptron that considered acceptable
 
                 lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
-
             else: #split based on split node
                 print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
             del self.__patterns #FIX for momory issues
 
-            print("lts1")
-            print(np.unique(lts1[:, self.__num_features], return_counts=True))
-            print("lts0")
-            print(np.unique(lts0[:, self.__num_features], return_counts=True))
+            print(f"lts1: {np.unique(lts1[:, self.__num_features], return_counts=True)}")
+            print(f"lts0: {np.unique(lts0[:, self.__num_features], return_counts=True)}")
 
             #CHILD CREATION + TRAINING
             self.__left = Node(lts1, self.__num_features)
@@ -151,13 +138,13 @@ class Node:
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
-    def __is_acceptable(self, y_true: np.ndarray, y_pred) -> bool:
+    def __make_acceptable_model(self, y_true: np.ndarray, y_pred: np.ndarray) -> None:
         """
-        This function check if the training of the perceptron is considered acceptable. To do this I have to check the follow condition:
+        This function create model created by perceptron that is considered acceptable. To do this I have to check the follow condition:
             E_t <= E_0 / 2 and (E_max - E_min) <= E_t
 
             E_t = 1 - Kc/kt, where Kc is number of correctly classified pattern and Kt is the total number of pattern into node
-            E_0 -> QUAL'È?
+            E_0 -> error of the trained neural network
             E_max = max{E_i}
             E_min = min{E_i}
             E_i = 1 - K_ci / K_ti, where K_ci is number of correctly classified pattern of class i and K_ti is total number of pattern classified as class i
@@ -172,14 +159,26 @@ class Node:
 
         :return: true if the two partitions are almost balanced, otherwise
         """
-       #TODO: da implementare
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+        old_weight = np.append(self.__nn.get_weight()[0], self.__nn.get_weight()[1])
+        tn, fn, fp, tp = confusion_matrix(y_true, y_pred).ravel() #da sistemare
+        K_t = y_true.shape[0]
 
         K_c = tn + tp
-        K_t = y_true.shape[0]
-        E_t = 1 - (K_c / K_t)
+        E_0 = 1 - (K_c / K_t)
 
-        E_0 = 0 #TODO: da capire come calcolarlo
+        # compute centroid of the local training set
+        centroid = self.__get_centroid(self.__patterns[:, 0 : self.__num_features])
+
+        # compute the new hyperplane passing throw centroid
+        hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
+        self.__nn.reinit_weights(hyperplane)
+
+        preds = self.__nn.predict(self.__patterns[:, 0 : self.__num_features], verbose=1)
+
+        tn, fn, fp, tp = confusion_matrix(y_true, preds).ravel() #da sistemare
+
+        K_c = tn + tp
+        E_t = 1 - (K_c / K_t)
 
         K_ci = np.array([tp, tn])
         K_ti = np.array([tp + fp, tn + fn])
@@ -189,7 +188,12 @@ class Node:
         E_max, E_min = np.max(E_i), np.min(E_i)
 
 
-        return (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t)
+        if (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t):
+            print("Perceptron substitution")
+            self.__type = NodeType.SUBSTITUTION
+        else:
+            self.__nn.reinit_weights(old_weight)
+
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
