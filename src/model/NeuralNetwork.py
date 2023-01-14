@@ -45,12 +45,12 @@ class NeuralNetwork:
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1)]
+        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=1)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
         #hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
-        self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
+        self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -87,7 +87,7 @@ class NeuralNetwork:
         return self.__model.evaluate(X, y, return_dict=True)
 
     def reinit_weights(self, weights: np.ndarray):
-        bias = np.array([weights[self.__num_input_features - 1]])
+        bias = np.array([weights[self.__num_input_features]])
         weights = weights[: self.__num_input_features].reshape((self.__num_input_features, 1))
 
         self.__model.set_weights([weights[: self.__num_input_features], bias])
@@ -133,11 +133,13 @@ def main() -> None:
     print(nn.get_weight()[0])
     print(nn.get_weight()[1])
 
-    nn.reinit_weights(np.zeros(X.shape[1]))
+    nn.reinit_weights(np.array([0, 1, 2]))
     #print(statistics.history['loss'])
     print(nn.get_weight())
     print(nn.get_weight()[0])
     print(nn.get_weight()[1])
+
+    print(nn)
 
     #for pattern, expected_y in zip(X_test, y_test):
      #   print(f"{nn.predict(pattern.reshape(1, -1))} -> {expected_y}")

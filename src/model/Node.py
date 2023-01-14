@@ -160,8 +160,11 @@ class Node:
         :return: true if the two partitions are almost balanced, otherwise
         """
         old_weight = np.append(self.__nn.get_weight()[0], self.__nn.get_weight()[1])
-        tn, fn, fp, tp = confusion_matrix(y_true, y_pred).ravel() #da sistemare
+        tn, fn, fp, tp = confusion_matrix(y_true, y_pred).ravel()
+        print(self.__nn.get_weight()[1])
         K_t = y_true.shape[0]
+
+        #print(f"{tn, fn, fp, tp}")
 
         K_c = tn + tp
         E_0 = 1 - (K_c / K_t)
@@ -170,12 +173,14 @@ class Node:
         centroid = self.__get_centroid(self.__patterns[:, 0 : self.__num_features])
 
         # compute the new hyperplane passing throw centroid
-        hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
+        hyperplane = np.append(self.__nn.get_weight()[0], (-1 * sum(self.__nn.get_weight()[0] * centroid)))
         self.__nn.reinit_weights(hyperplane)
 
         preds = self.__nn.predict(self.__patterns[:, 0 : self.__num_features], verbose=1)
 
-        tn, fn, fp, tp = confusion_matrix(y_true, preds).ravel() #da sistemare
+        tn, fn, fp, tp = confusion_matrix(y_true, preds).ravel()
+        print(self.__nn.get_weight()[1])
+        #print(f"{tn, fn, fp, tp}")
 
         K_c = tn + tp
         E_t = 1 - (K_c / K_t)
@@ -186,9 +191,11 @@ class Node:
         E_i = 1 - np.divide(K_ci, K_ti)
 
         E_max, E_min = np.max(E_i), np.min(E_i)
+        #print(f"E_0 = {E_0}")
+        #print(f"E_t = {E_t}")
+        #print(f"E_max - E_min = {E_max - E_min}")
 
-
-        if (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t):
+        if (E_t <= E_0 / 2) and ((E_max - E_min) <= E_t):
             print("Perceptron substitution")
             self.__type = NodeType.SUBSTITUTION
         else:
@@ -541,6 +548,7 @@ def main() -> None:
 
 
     patterns = pd.read_csv("../../csv/train.csv").to_numpy()
+    #print(patterns)
     #print(patterns.shape)
     #X, y = make_moons(100)
     #X, y = make_classification(10000, 40, n_classes=2)
@@ -555,6 +563,8 @@ def main() -> None:
 
     root = Node(patterns, patterns.shape[1] - 1)
     #X, y = patterns[0], patterns[1]
+
+    #print(root)
 
     root.train(250, 5, verbose=1)
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
