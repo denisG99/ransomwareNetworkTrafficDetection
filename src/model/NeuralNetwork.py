@@ -45,12 +45,12 @@ class NeuralNetwork:
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
-        callbacks = [EarlyStopping(monitor="loss", patience=wait_epochs, verbose=1)]
+        callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1)]
         #callbacks = [EarlyStopping(monitor="val_loss", patience=wait_epochs, verbose=1),
          #            CSVLogger("log.csv", separator=',', append=False)]
 
         #hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
-        self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0, callbacks=callbacks)
+        self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -73,7 +73,7 @@ class NeuralNetwork:
         #prediction = self.__model.predict(X, batch_size=1, verbose=0)
         #for perceptron in self.__perceptrons:
          #   output = perceptron.predict(X)
-        return self.__model.predict(X, batch_size=X.shape[0], verbose=verbose)
+        return np.where(self.__model.predict(X, batch_size=X.shape[0], verbose=verbose) >= 0.5, 1, 0)
 
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> dict:
         """

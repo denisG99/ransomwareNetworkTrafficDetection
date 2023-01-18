@@ -35,7 +35,7 @@ class NeuralTree:
         #self.__num_nodes += 1
 
     def train(self, epochs: int, verbose: int = 0) -> None:
-            self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
+        self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
 
     #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
     def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> Classification:
