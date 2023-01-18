@@ -10,12 +10,12 @@ DATASET_PATH = "../csv"
 
 def main():
     try:
-        with open(f"{EXPORTED_MODEL}/nt_unbalance.pkl", 'rb') as file:
+        with open(f"{EXPORTED_MODEL}/nt_unbalance.pkl", 'rb') as _:
             print("CARICAMENTO MODELLO DA ../exported_model/nt_unbalance.pkl")
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        nt = NeuralTree(f"{DATASET_PATH}/train.csv", 5)
+        nt = NeuralTree(f"{DATASET_PATH}/norm_train.csv", 5)
         start_time = time.time()
 
         print("INIZIO ADDESTRAMENTO NEURAL TREE")
