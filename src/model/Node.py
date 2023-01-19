@@ -3,6 +3,7 @@ from typing import Tuple, Union, Dict, Any, Iterable
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
+
 from scipy.stats import entropy
 
 from matplotlib import pyplot as plt
@@ -77,7 +78,7 @@ class Node:
         self.__is_splitted = False
         #self.__is_removed = False
 
-        if self.__is_homogeneous():
+        if self.__is_homogeneous(self.__patterns[:, self.__num_features]):
             self.__type = NodeType.LEAF
             self.__label = Classification(max(occurs, key=occurs.get))
             self.__num_classi = 1
@@ -102,7 +103,7 @@ class Node:
 
         return entropy(probs, base=2), dict(zip(labels, counts))
 
-    def __is_homogeneous(self) -> bool:
+    def __is_homogeneous(self, y) -> bool:
         """
         This function check if the dataset may be considered homogeneous. To do this you need to define some kind of
         threshold which depends on dataset cardinality.
@@ -114,7 +115,10 @@ class Node:
         """
         n = self.__patterns.shape[0]
 
-        return self.__entropy <= math.log2(n) / n
+        print(f"entropia = {self.__entropy}")
+        print(f"th_entropia = {math.log2(n) / n}")
+
+        return self.__entropy <= (math.log2(n) / n)
 
     def train(self, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
         if not self.__type == NodeType.LEAF:
@@ -137,12 +141,12 @@ class Node:
 
             del self.__patterns #FIX for momory issues
 
-            print(f"lts1: {np.unique(lts1[:, self.__num_features], return_counts=True)}")
             print(f"lts0: {np.unique(lts0[:, self.__num_features], return_counts=True)}")
+            print(f"lts1: {np.unique(lts1[:, self.__num_features], return_counts=True)}")
 
             #CHILD CREATION + TRAINING
-            self.__left = Node(lts1, self.__num_features)
-            self.__right = Node(lts0, self.__num_features)
+            self.__left = Node(lts0, self.__num_features)
+            self.__right = Node(lts1, self.__num_features)
 
             self.__left.train(epochs, wait_epochs, verbose=verbose)
             self.__right.train(epochs, wait_epochs, verbose=verbose)
@@ -151,6 +155,7 @@ class Node:
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
+    #TODO: da sistemare
     def __make_acceptable_model(self, y_true: np.ndarray, y_pred: np.ndarray) -> None:
         """
         This function create model created by perceptron that is considered acceptable. To do this I have to check the follow condition:
@@ -177,7 +182,7 @@ class Node:
         print(self.__nn.get_weight()[1])
         K_t = y_true.shape[0]
 
-        print(f"Perceptron addestrato: {tn, fp, fn, tp}")
+        #print(f"Perceptron addestrato: {tn, fp, fn, tp}")
 
         K_c = tn + tp
         E_0 = 1 - (K_c / K_t)
@@ -186,14 +191,14 @@ class Node:
         centroid = self.__get_centroid(self.__patterns[:, 0 : self.__num_features])
 
         # compute the new hyperplane passing throw centroid
-        hyperplane = np.append(self.__nn.get_weight()[0], centroid.dot(self.__nn.get_weight()[1]))
+        hyperplane = np.append(self.__nn.get_weight()[0], centroid.dot(self.__nn.get_weight()[0]))
         self.__nn.reinit_weights(hyperplane) # perceptron substitution
 
         preds = self.__nn.predict(self.__patterns[:, 0 : self.__num_features], verbose=1)
 
         tn, fp, fn, tp = confusion_matrix(y_true, preds).ravel()
         #print(self.__nn.get_weight()[1])
-        print(f"Perceptron da valutare: {tn, fp, fn, tp}")
+        #print(f"Perceptron da valutare: {tn, fp, fn, tp}")
 
         K_c = tn + tp
         E_t = 1 - (K_c / K_t)
@@ -327,14 +332,12 @@ class Node:
 
         :return: array contains hyperplane's coefficients
         """
-        #TODO: da verificare
         classes = list(points.keys())
 
         direction_vector = np.subtract(points.get(classes[1]), points.get(classes[0]))
-        not_collinear_vector = np.cross(direction_vector, self.__nn.get_weight()[0])
-        normal_vector = np.cross(direction_vector, not_collinear_vector)
+        print(f"Differenza tra centroidi: {direction_vector}")
 
-        return np.append(normal_vector, p.dot(normal_vector))
+        return np.append(direction_vector, -p.dot(direction_vector))
 
 
     def __dataset_split(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> Tuple[np.ndarray, np.ndarray]:

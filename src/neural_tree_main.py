@@ -15,11 +15,11 @@ def main():
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        nt = NeuralTree(f"{DATASET_PATH}/norm_train.csv", 5)
+        nt = NeuralTree(f"{DATASET_PATH}/norm_train.csv", 25)
         start_time = time.time()
 
         print("INIZIO ADDESTRAMENTO NEURAL TREE")
-        nt.train(250, 1)
+        nt.train(250, 0)
 
         print(f"L'addestramento della bayesian network ha impiegato {time.time() - start_time} secondi")
 
