@@ -35,7 +35,7 @@ class NeuralTree:
         #self.__num_nodes += 1
 
     def train(self, epochs: int, verbose: int = 0) -> None:
-            self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
+        self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
 
     #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
     def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> Classification:
@@ -78,7 +78,7 @@ class NeuralTree:
 
         return nt
 
-    def visualize(self, height: int, width: int) -> None:
+    #def visualize(self, height: int, width: int) -> None:
         """
         This function create a visualization of the Neural Tree that follow these rules:
             * white square -> decision node
@@ -90,12 +90,13 @@ class NeuralTree:
         :param width: image width
         :return: visualization of the Neural Tree
         """
+    """
         img = np.full((height, width, 3), 255, dtype='uint8')
 
         cv.imshow("Neural Tree visualization", self.__root.visualize_node(img, height, width, 40))
         cv.waitKey(0)
         cv.destroyAllWindows()
-
+     """
 
 
 #-----------------------------------------------------------------------------------------------------------------------

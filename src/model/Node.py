@@ -3,10 +3,10 @@ from typing import Tuple, Union, Dict, Any, Iterable
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
+
 from scipy.stats import entropy
 
 from matplotlib import pyplot as plt
-
 from NeuralNetwork import NeuralNetwork
 from NodeType import NodeType
 from Classification import Classification
@@ -16,8 +16,9 @@ import Node
 import numpy as np
 import uuid
 #import cv2 as cv
+import math
 
-ENTROPY_TH: float = 0.1 #TODO: da cambiare
+#ENTROPY_TH: float = 0.2 #TODO: da cambiare
 
 @dataclass
 class Node:
@@ -77,7 +78,7 @@ class Node:
         self.__is_splitted = False
         #self.__is_removed = False
 
-        if self.__entropy <= ENTROPY_TH:
+        if self.__is_homogeneous(self.__patterns[:, self.__num_features]):
             self.__type = NodeType.LEAF
             self.__label = Classification(max(occurs, key=occurs.get))
             self.__num_classi = 1
@@ -102,6 +103,22 @@ class Node:
 
         return entropy(probs, base=2), dict(zip(labels, counts))
 
+    def __is_homogeneous(self, y) -> bool:
+        """
+        This function check if the dataset may be considered homogeneous. To do this you need to define some kind of
+        threshold which depends on dataset cardinality.
+
+        The threshold is thus defined:
+                entropy_th = log2(n)/n, dove n è la cardinalità del dataset
+
+        :return: true if the dataset is homogeneous, otherwise false
+        """
+        n = self.__patterns.shape[0]
+
+        print(f"entropia = {self.__entropy}")
+        print(f"th_entropia = {math.log2(n) / n}")
+
+        return self.__entropy <= (math.log2(n) / n)
 
     def train(self, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
         if not self.__type == NodeType.LEAF:
@@ -115,27 +132,21 @@ class Node:
             preds = self.__nn.predict(data, verbose=verbose)
 
             if not len(np.unique(preds)) == 1:
-                if not self.__is_acceptable(target, preds): #check if the trained perceptron is considered acceptable
-                    #compute centroid of the local training set
-                    centroid = self.__get_centroid(data)
-
-                    #compute the new hyperplane passing throw centroid
-                    hyperplane = np.append(self.__nn.get_weight()[0], sum(self.__nn.get_weight()[0] * centroid))
-                    self.__nn.reinit_weights(hyperplane)
-
-                    self.__type = NodeType.SUBSTITUTION
+                self.__make_acceptable_model(target, preds) #create trained perceptron that considered acceptable
 
                 lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
-
             else: #split based on split node
                 print("Creazione split rule")
                 lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
 
             del self.__patterns #FIX for momory issues
 
+            print(f"lts0: {np.unique(lts0[:, self.__num_features], return_counts=True)}")
+            print(f"lts1: {np.unique(lts1[:, self.__num_features], return_counts=True)}")
+
             #CHILD CREATION + TRAINING
-            self.__left = Node(lts1, self.__num_features)
-            self.__right = Node(lts0, self.__num_features)
+            self.__left = Node(lts0, self.__num_features)
+            self.__right = Node(lts1, self.__num_features)
 
             self.__left.train(epochs, wait_epochs, verbose=verbose)
             self.__right.train(epochs, wait_epochs, verbose=verbose)
@@ -144,13 +155,14 @@ class Node:
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
-    def __is_acceptable(self, y_true: np.ndarray, y_pred) -> bool:
+    #TODO: da sistemare
+    def __make_acceptable_model(self, y_true: np.ndarray, y_pred: np.ndarray) -> None:
         """
-        This function check if the training of the perceptron is considered acceptable. To do this I have to check the follow condition:
+        This function create model created by perceptron that is considered acceptable. To do this I have to check the follow condition:
             E_t <= E_0 / 2 and (E_max - E_min) <= E_t
 
             E_t = 1 - Kc/kt, where Kc is number of correctly classified pattern and Kt is the total number of pattern into node
-            E_0 -> QUAL'È?
+            E_0 -> error of the trained neural network
             E_max = max{E_i}
             E_min = min{E_i}
             E_i = 1 - K_ci / K_ti, where K_ci is number of correctly classified pattern of class i and K_ti is total number of pattern classified as class i
@@ -160,19 +172,36 @@ class Node:
             * K_ci -> cm[i][i]
             * K_ti -> sum of i-th row
 
-        :param y_true: array containing label
+        :param y_true: array containing true label
         :param y_pred: array containing predicted label
 
         :return: true if the two partitions are almost balanced, otherwise
         """
-       #TODO: da implementare
+        old_weight = np.append(self.__nn.get_weight()[0], self.__nn.get_weight()[1])
         tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+        print(self.__nn.get_weight()[1])
+        K_t = y_true.shape[0]
+
+        #print(f"Perceptron addestrato: {tn, fp, fn, tp}")
 
         K_c = tn + tp
-        K_t = y_true.shape[0]
-        E_t = 1 - (K_c / K_t)
+        E_0 = 1 - (K_c / K_t)
 
-        E_0 = 0 #TODO: da capire come calcolarlo
+        # compute centroid of the local training set
+        centroid = self.__get_centroid(self.__patterns[:, 0 : self.__num_features])
+
+        # compute the new hyperplane passing throw centroid
+        hyperplane = np.append(self.__nn.get_weight()[0], centroid.dot(self.__nn.get_weight()[0]))
+        self.__nn.reinit_weights(hyperplane) # perceptron substitution
+
+        preds = self.__nn.predict(self.__patterns[:, 0 : self.__num_features], verbose=1)
+
+        tn, fp, fn, tp = confusion_matrix(y_true, preds).ravel()
+        #print(self.__nn.get_weight()[1])
+        #print(f"Perceptron da valutare: {tn, fp, fn, tp}")
+
+        K_c = tn + tp
+        E_t = 1 - (K_c / K_t)
 
         K_ci = np.array([tp, tn])
         K_ti = np.array([tp + fp, tn + fn])
@@ -180,10 +209,17 @@ class Node:
         E_i = 1 - np.divide(K_ci, K_ti)
 
         E_max, E_min = np.max(E_i), np.min(E_i)
+        #print(f"E_0 = {E_0}")
+        #print(f"E_t = {E_t}")
+        #print(f"E_max - E_min = {E_max - E_min}")
 
+        if (E_t <= E_0 / 2) and ((E_max - E_min) <= E_t):
+            print("Perceptron substitution")
+            self.__type = NodeType.SUBSTITUTION
+        else:
+            self.__nn.reinit_weights(old_weight)
 
-        return (E_t <= (E_0 / 2)) and ((E_max - E_min) <= E_t)
-    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
+    def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
         This function create a split node in case the train stopping earlier (any improvement for a number of epochs)
 
@@ -280,27 +316,28 @@ class Node:
 
     def __split_hyperplane(self, points: dict, p: np.ndarray) -> np.ndarray:
         """
-        This function compute orthogonal hyperplane to straight passing through 2 points, passing for point P.
+        This function compute orthogonal hyperplane to line passing through 2 points and passing for point P.
 
         IDEA:
-            * compute hyperplane through 2 centroids in this way:
-                * compute direction array, as a difference between two points: v = (B - A)
-            * set the proportionality of two vector define as n = a*v, with a = 1 so n = v
-            * find the known term d, forcing the hyperplane passing through P
+            * compute orthogonal hyperplane to line passing through 2 points and passing for point P in this way:
+                * compute direction_vector array, as a difference between two points: v = (B - A);
+                * find a vector that is not collinear to the direction vector;
+                * compute the normal vector of the line by taking the cross product of the direction vector and not_collinear vector;
+                * find the known term d, forcing the hyperplane passing through P
+
+            As not collinear vector we consider the cross product between direction vector and weight vector generated by perceptron
 
         :param points: centroids list
         :param p: median point between two centroids
 
         :return: array contains hyperplane's coefficients
         """
-        #TODO: da sistemare il fatto che iperpiano non passa per il punto centrale e non è ortogonale alla retta passante per i due centroidi
-        #hyperplane = np.array([])
         classes = list(points.keys())
 
-        hyperplane = np.subtract(points.get(classes[1]), points.get(classes[0]))
-        hyperplane = np.append(hyperplane, (-1 * sum(hyperplane * p)))
+        direction_vector = np.subtract(points.get(classes[1]), points.get(classes[0]))
+        print(f"Differenza tra centroidi: {direction_vector}")
 
-        return hyperplane
+        return np.append(direction_vector, -p.dot(direction_vector))
 
 
     def __dataset_split(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0) -> Tuple[np.ndarray, np.ndarray]:
@@ -530,6 +567,7 @@ def main() -> None:
 
 
     patterns = pd.read_csv("../../csv/train.csv").to_numpy()
+    #print(patterns)
     #print(patterns.shape)
     #X, y = make_moons(100)
     #X, y = make_classification(10000, 40, n_classes=2)
@@ -545,7 +583,9 @@ def main() -> None:
     root = Node(patterns, patterns.shape[1] - 1)
     #X, y = patterns[0], patterns[1]
 
-    root.train(250, 5, verbose=1)
+    #print(root)
+
+    root.train(250, 5, verbose=1, norm=True)
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 
