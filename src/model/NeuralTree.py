@@ -13,11 +13,16 @@ import pickle as pkl
 class NeuralTree:
     """
     Costruttore:
-        NeuralTree(__data_path,
+        NeuralTree(__entropy,
+                   __num_features,
+                   __cardinality,
                    __wait_epochs = 0)
         """
     __root : Node = field(init=False)
-    __data_path : str = field(repr=False)
+    __entropy: float = field(repr=False)
+    __num_features : int
+    __cardinality : int
+    #__data_path : str = field(repr=False)
     #TREE STATISTICS
     """
     __depth: int = 0 #depth of tree
@@ -29,13 +34,15 @@ class NeuralTree:
     __wait_epochs : int = 0 #wait epochs that wait before splitting node if the boundaries don't get any improvement
 
     def __post_init__(self):
-        data = pd.read_csv(self.__data_path, low_memory=False).to_numpy()
+        #data = pd.read_csv(self.__data_path, low_memory=False).to_numpy()
 
-        self.__root = Node(data, data.shape[1] - 1)
+        #self.__root = Node(data.shape[1] - 1)
+        self.__root = Node(self.__entropy, self.__num_features, self.__cardinality)
+        del self.__entropy
         #self.__num_nodes += 1
 
-    def train(self, epochs: int, verbose: int = 0) -> None:
-        self.__root.train(epochs, self.__wait_epochs, verbose=verbose)
+    def train(self,data: np.ndarray, epochs: int, verbose: int = 0) -> None:
+        self.__root.train(data, epochs, self.__wait_epochs, verbose=verbose)
 
     #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
     def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> Classification:

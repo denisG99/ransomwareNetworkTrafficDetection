@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Union, Dict, Any, Iterable
 
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 from scipy.stats import entropy
 
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from NeuralNetwork import NeuralNetwork
 from NodeType import NodeType
 from Classification import Classification
@@ -18,14 +18,13 @@ import uuid
 #import cv2 as cv
 import math
 
-#ENTROPY_TH: float = 0.2 #TODO: da cambiare
-
 @dataclass
 class Node:
     """
     Costruttore:
-        Node(__patterns,
+        Node(__entropy,
              __num_features,
+             __cardinality,
              __label = Classification.NONE,
              __type = NodeType.DECISION,
              __threshold = 0.5,
@@ -33,14 +32,15 @@ class Node:
     """
     __id: str = field(init=False, repr=False) #node identifier used in logging
     __nn : NeuralNetwork = field(init=False, repr=False) #perceptron definition
-    __entropy: float = field(init=False)  #dataset entropy
     #__childs: np.ndarray = field(init=False) #list containing childs nodes
     __left: Node = field(init=False) #left child
     __right: Node = field(init=False) #rigth child
     __is_splitted: bool = field(init=False)  #indicate if node is split
     #__is_removed: bool = field(init=False)  #indicate if node has executed pattern removal
-    __patterns: np.ndarray  #field containing training data for perceptron
+    #__patterns: np.ndarray  #field containing training data for perceptron
+    __entropy: float # dataset entropy
     __num_features: int  #number of features into dataset
+    __cardinality: int # dataset cardinality
     __label: Classification = Classification.NONE
     __type : NodeType = NodeType.DECISION
     __threshold : float = 0.5
@@ -71,22 +71,24 @@ class Node:
     def __post_init__(self):
         self.__id = str(uuid.uuid4())
         self.__nn = NeuralNetwork(self.__num_features)
-        self.__entropy, occurs = self.__compute_entropy()
+        #self.__entropy, occurs = self.__compute_entropy()
         #self.__childs = np.array([], dtype=Node)
         self.__left = None
         self.__right = None
         self.__is_splitted = False
         #self.__is_removed = False
 
-        if self.__is_homogeneous(self.__patterns[:, self.__num_features]):
+        if self.__is_homogeneous(self.__cardinality):#self.__patterns[:, self.__num_features]):
             self.__type = NodeType.LEAF
-            self.__label = Classification(max(occurs, key=occurs.get))
+            #self.__label = Classification(max(occurs, key=occurs.get))
             self.__num_classi = 1
             self.__nn.set_num_classi(1)
+        else:
+            self.__label = Classification.NONE
 
-    def __compute_entropy(self) -> Tuple[Union[float, np.ndarray, Iterable, int], Dict[Any, Any]] or Tuple[None, None]:
+    def __compute_entropy(self, data) -> Tuple[Union[float, np.ndarray, Iterable, int], Dict[Any, Any]]:
         probs = list()
-        label = self.__patterns[:, self.__num_features]
+        label = data[:, self.__num_features]
         labels, counts = np.unique(label, return_counts=True)
 
         for count in counts:
@@ -103,7 +105,7 @@ class Node:
 
         return entropy(probs, base=2), dict(zip(labels, counts))
 
-    def __is_homogeneous(self, y) -> bool:
+    def __is_homogeneous(self, n) -> bool:
         """
         This function check if the dataset may be considered homogeneous. To do this you need to define some kind of
         threshold which depends on dataset cardinality.
@@ -113,56 +115,75 @@ class Node:
 
         :return: true if the dataset is homogeneous, otherwise false
         """
-        n = self.__patterns.shape[0]
+        #n = self.__patterns.shape[0]
 
-        print(f"entropia = {self.__entropy}")
-        print(f"th_entropia = {math.log2(n) / n}")
+        #print(f"entropia = {self.__entropy}")
+        #print(f"th_entropia = {math.log2(n) / n}")
 
         return self.__entropy <= (math.log2(n) / n)
 
-    def train(self, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
+    def train(self, data: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
         if not self.__type == NodeType.LEAF:
-            data = self.__patterns[:, 0 : self.__num_features]  # patterns dataset
-            target = self.__patterns[:, self.__num_features]  # labels dataset
+            X = data[:, 0 : self.__num_features]  # patterns dataset
+            y = data[:, self.__num_features]  # labels dataset
 
-            self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
+            #self.__nn.fit(data, target, epochs, wait_epochs, verbose=verbose)
+            self.__nn.fit(X, y, epochs, wait_epochs, verbose=verbose)
 
             #DATASET SPLITTING
             #split based on perceptron substitutions
-            preds = self.__nn.predict(data, verbose=verbose)
+            #preds = self.__nn.predict(data, verbose=verbose)
+            preds = self.__nn.predict(X, verbose=verbose)
+            print(f"Bias dopo addestrameto: {self.__nn.get_weight()[1]}")
 
             if not len(np.unique(preds)) == 1:
-                self.__make_acceptable_model(target, preds) #create trained perceptron that considered acceptable
+                #self.__make_acceptable_model(target, preds) #create trained perceptron that considered acceptable
+                self.__make_acceptable_model(X, y, preds) #create trained perceptron that considered acceptable
+                print(f"Bias accettabile: {self.__nn.get_weight()[1]}")
 
-                lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
+                #lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
+                lts0, lts1 = self.__dataset_split(data, X, verbose=verbose)
             else: #split based on split node
                 print("Creazione split rule")
-                lts0, lts1, _, _ = self.__create_split_node(self.__patterns, data, verbose=verbose)
+                #lts0, lts1 = self.__create_split_node(self.__patterns, data, verbose=verbose)
+                lts0, lts1 = self.__create_split_node(data, X, verbose=verbose)
 
-            del self.__patterns #FIX for momory issues
+            #del self.__patterns #FIX for momory issues
 
+
+            #print(lts0)
+            #print(lts1)
             print(f"lts0: {np.unique(lts0[:, self.__num_features], return_counts=True)}")
             print(f"lts1: {np.unique(lts1[:, self.__num_features], return_counts=True)}")
 
             #CHILD CREATION + TRAINING
-            self.__left = Node(lts0, self.__num_features)
-            self.__right = Node(lts1, self.__num_features)
+            #self.__left = Node(lts1, self.__num_features)
+            #self.__right = Node(lts0, self.__num_features)
 
-            self.__left.train(epochs, wait_epochs, verbose=verbose)
-            self.__right.train(epochs, wait_epochs, verbose=verbose)
+            #self.__left.train(epochs, wait_epochs, verbose=verbose)
+            #self.__right.train(epochs, wait_epochs, verbose=verbose)
+
+            entropy, occurs = self.__compute_entropy(lts1)
+            self.__left = Node(entropy, self.__num_features, lts1.shape[0], Classification(max(occurs, key=occurs.get)))
+
+            entropy, occurs = self.__compute_entropy(lts0)
+            self.__right = Node(entropy, self.__num_features, lts0.shape[0], Classification(max(occurs, key=occurs.get)))
+
+            self.__left.train(lts1, epochs, wait_epochs, verbose=verbose)
+            self.__right.train(lts0, epochs, wait_epochs, verbose=verbose)
 
             print(f"END TRAINING Node {self.__id}")
 
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
     #TODO: da sistemare
-    def __make_acceptable_model(self, y_true: np.ndarray, y_pred: np.ndarray) -> None:
+    def __make_acceptable_model(self, X, y_true: np.ndarray, y_pred: np.ndarray) -> None:
         """
         This function create model created by perceptron that is considered acceptable. To do this I have to check the follow condition:
             E_t <= E_0 / 2 and (E_max - E_min) <= E_t
 
             E_t = 1 - Kc/kt, where Kc is number of correctly classified pattern and Kt is the total number of pattern into node
-            E_0 -> error of the trained neural network
+            E_0 -> error of the trained perceptron
             E_max = max{E_i}
             E_min = min{E_i}
             E_i = 1 - K_ci / K_ti, where K_ci is number of correctly classified pattern of class i and K_ti is total number of pattern classified as class i
@@ -179,7 +200,7 @@ class Node:
         """
         old_weight = np.append(self.__nn.get_weight()[0], self.__nn.get_weight()[1])
         tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-        print(self.__nn.get_weight()[1])
+        #print(self.__nn.get_weight()[1])
         K_t = y_true.shape[0]
 
         #print(f"Perceptron addestrato: {tn, fp, fn, tp}")
@@ -188,13 +209,13 @@ class Node:
         E_0 = 1 - (K_c / K_t)
 
         # compute centroid of the local training set
-        centroid = self.__get_centroid(self.__patterns[:, 0 : self.__num_features])
+        centroid = self.__get_centroid(X)
 
         # compute the new hyperplane passing throw centroid
         hyperplane = np.append(self.__nn.get_weight()[0], centroid.dot(self.__nn.get_weight()[0]))
         self.__nn.reinit_weights(hyperplane) # perceptron substitution
 
-        preds = self.__nn.predict(self.__patterns[:, 0 : self.__num_features], verbose=1)
+        preds = self.__nn.predict(X, verbose=1)
 
         tn, fp, fn, tp = confusion_matrix(y_true, preds).ravel()
         #print(self.__nn.get_weight()[1])
@@ -209,15 +230,22 @@ class Node:
         E_i = 1 - np.divide(K_ci, K_ti)
 
         E_max, E_min = np.max(E_i), np.min(E_i)
-        #print(f"E_0 = {E_0}")
-        #print(f"E_t = {E_t}")
-        #print(f"E_max - E_min = {E_max - E_min}")
+        print(f"E_0 = {E_0}")
+        print(f"E_0 / 2 = {E_0/2}")
+        print(f"E_t = {E_t}")
+        print(f"E_max - E_min = {E_max - E_min}")
 
-        if (E_t <= E_0 / 2) and ((E_max - E_min) <= E_t):
+
+        #TODO: ricontrollare condizione
+        if E_t <= (E_0 / 2) and (E_max - E_min) <= E_t:
             print("Perceptron substitution")
             self.__type = NodeType.SUBSTITUTION
         else:
+            # trained perceptron is acceptable
+            print("Using trained perceptron")
             self.__nn.reinit_weights(old_weight)
+        #print(self.__nn.get_weight())
+
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -234,7 +262,7 @@ class Node:
         :return: return an arrays containing the two dataset split
         """
         #find the two larger cardinality class
-        #TODO: da sistemare il fatto che iperpiano non passa per il punto centrale e non è ortogonale alla retta passante per i due centroidi
+        """
         largest_classes = self.__get_largest_class(lts, 2)
         splitted_by_class = dict()
         centroids = dict()
@@ -255,8 +283,36 @@ class Node:
         lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
         self.__is_splitted = True
 
-        return lts0, lts1, centroids, center
+        return lts0, lts1
+        """
+        #lts.tofile("to_split.csv", ',')
+        #np.savetxt("to_split.csv", lts, delimiter=',')
+        y = lts[:, self.__num_features]
 
+        #print(np.unique(y, return_counts=True))
+        #print(y.shape)
+
+        zeros = X[np.where(y == 0)]
+        ones = X[np.where(y == 1)]
+
+        #print(zeros)
+        #print(zeros.shape)
+        #print(ones)
+        #print(ones.shape)
+
+        c_0 = self.__get_centroid(zeros)
+        c_1 = self.__get_centroid(ones)
+
+        center = self.__get_center_between_centroids(c_0, c_1)
+        split_rule = self.__split_hyperplane(c_0, c_1, center)
+
+        self.__nn.reinit_weights(split_rule)
+        # print(self.__nn.get_weight())
+
+        lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
+        self.__is_splitted = True
+
+        return lts0, lts1
     def __get_largest_class(self, lts: np.ndarray, num_largest: int = 2) -> np.ndarray:
         """
         This function count the cardinality foreach class e return the top n classes
@@ -290,31 +346,27 @@ class Node:
 
         :return: array containing centroid's coordinates
         """
-        centroid_cords = np.zeros(self.__num_features)
+        return np.mean(data, axis=0)
 
-        for i in range(self.__num_features):
-            centroid_cords[i] = np.sum(data[:, i]) / len(data[:, i])
-
-        return centroid_cords
-
-    def __get_center_between_centroids(self, centroids: dict) -> np.ndarray:
+    def __get_center_between_centroids(self, c_1: np.ndarray, c_2: np.ndarray) -> np.ndarray:
         """
         This function calculates the center point between two point, in this case are centroids.
                             ((x1+x2+x3+...+xn)/2, (y1+y2+y3+...+yn)/2, ...)
 
-        :param centroids: array containing centroids coordinates
+        :param c_1: array containing centroid coordinates
+        :param c_2: array containing centroid coordinates
 
         :return: array containing center coordinates
         """
-        center = np.zeros(self.__num_features)
+        #center =
 
-        for key in centroids.keys():
-            for i in range(self.__num_features):
-                center[i] += centroids[key][i]
+        #for key in centroids.keys():
+         #   for i in range(self.__num_features):
+          #      center[i] += centroids[key][i]
+        #return np.add(c_1, c_2) / 2
+        return np.mean([c_1, c_2], axis=0)
 
-        return center / 2
-
-    def __split_hyperplane(self, points: dict, p: np.ndarray) -> np.ndarray:
+    def __split_hyperplane(self, c_1: np.ndarray, c_2: np.ndarray, p: np.ndarray) -> np.ndarray:
         """
         This function compute orthogonal hyperplane to line passing through 2 points and passing for point P.
 
@@ -327,15 +379,17 @@ class Node:
 
             As not collinear vector we consider the cross product between direction vector and weight vector generated by perceptron
 
-        :param points: centroids list
+        :param c_1: centroid coordinates
+        :param c_2: centroid coordinates
         :param p: median point between two centroids
 
         :return: array contains hyperplane's coefficients
         """
-        classes = list(points.keys())
+        #TODO: da verificare
+        #classes = list(points.keys())
 
-        direction_vector = np.subtract(points.get(classes[1]), points.get(classes[0]))
-        print(f"Differenza tra centroidi: {direction_vector}")
+        direction_vector = np.subtract(c_2, c_1)
+        #print(f"Differenza tra centroidi: {direction_vector}")
 
         return np.append(direction_vector, -p.dot(direction_vector))
 
@@ -361,7 +415,7 @@ class Node:
         #status = 1
         #print(preds)
 
-        data = np.append(lts, preds, axis=1)
+        #data = np.append(lts, preds, axis=1)
 
         """
         for pred, row in zip(preds, lts):
@@ -375,13 +429,15 @@ class Node:
 
             status += 1
         """
-        lts0 = lts[np.where(data[:, data.shape[1] - 1] == 0)]
-        lts1 = lts[np.where(data[:, data.shape[1] - 1] == 1)]
+        lts0 = lts[np.where(preds == 0)[0]]
+        lts1 = lts[np.where(preds == 1)[0]]
         #lts0 = np.resize(lts0, (int(len(lts0) / (self.__num_features + 1)), self.__num_features + 1))
         #lts1 = np.resize(lts1, (int(len(lts1) / (self.__num_features + 1)), self.__num_features + 1))
 
-        #print(lts0)
-        #print(lts1)
+        #print(preds.shape)
+        #print(np.unique(preds, return_counts=True))
+        #print(f"lts0:\n {lts0}")
+        #print(f"lts1:\n {lts1}")
 
         #row0, row1 = lts0.shape[0], lts1.shape[0]
 
