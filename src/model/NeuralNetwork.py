@@ -1,9 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Tuple, Any, List
 
-from keras.callbacks import EarlyStopping, CSVLogger
-#from Perceptron import Perceptron
-#from sklearn.linear_model import Perceptron
+from keras.callbacks import EarlyStopping
 from keras.layers import Dense
 from keras.models import Sequential
 from keras.activations import hard_sigmoid
@@ -128,9 +125,11 @@ def main() -> None:
     #print(f"Training -> {nn.evaluate(X_train, y_train)}")
     #print(f"Testing -> {nn.evaluate(X_test, y_test)}")
 
+    centroid = np.zeros(2)
 
     #print(nn.get_weight())
     #print(nn.get_weight()[0])
+    #print(centroid.dot(nn.get_weight()[0]))
     #print(nn.get_weight()[1])
 
     #nn.reinit_weights(np.array([0, 1, 2]))
@@ -150,7 +149,7 @@ def main() -> None:
     #print("Test accuracy:")
     #nn.evaluate(X_test, y_test)
 
-    print(nn.get_weight()[0].reshape(X.shape[1],))
+    #print(nn.get_weight()[0].reshape(X.shape[1],))
 
 
 if __name__ == "__main__":
