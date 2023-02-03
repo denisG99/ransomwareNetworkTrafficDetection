@@ -148,7 +148,7 @@ class Node:
                 #lts0, lts1 = self.__create_split_node(self.__patterns, data, verbose=verbose)
                 lts0, lts1 = self.__create_split_node(data, X, verbose=verbose)
 
-            #del self.__patterns #FIX for momory issues
+            del data, X, y, preds #FIX for momory issues
 
 
             #print(lts0)
@@ -246,6 +246,8 @@ class Node:
             self.__nn.reinit_weights(old_weight)
         #print(self.__nn.get_weight())
 
+        del preds #FIX memory issues
+
 
     def __create_split_node(self, lts: np.ndarray, X: np.ndarray, verbose: int = 0): #-> tuple[np.ndarray, np.ndarray, dict[Any, np.ndarray], np.ndarray]:
         """
@@ -303,6 +305,8 @@ class Node:
         c_0 = self.__get_centroid(zeros)
         c_1 = self.__get_centroid(ones)
 
+        del zeros, ones #FIX memory issues
+
         center = self.__get_center_between_centroids(c_0, c_1)
         split_rule = self.__split_hyperplane(c_0, c_1, center)
 
@@ -311,6 +315,8 @@ class Node:
 
         lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
         self.__is_splitted = True
+
+        del lts, X
 
         return lts0, lts1
     def __get_largest_class(self, lts: np.ndarray, num_largest: int = 2) -> np.ndarray:
