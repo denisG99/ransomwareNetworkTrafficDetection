@@ -316,7 +316,7 @@ class Node:
         lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
         self.__is_splitted = True
 
-        del lts, X
+        del lts, X, c_0, c_1, center #FIX memory issues
 
         return lts0, lts1
     def __get_largest_class(self, lts: np.ndarray, num_largest: int = 2) -> np.ndarray:
@@ -365,11 +365,6 @@ class Node:
         :return: array containing center coordinates
         """
         #center =
-
-        #for key in centroids.keys():
-         #   for i in range(self.__num_features):
-          #      center[i] += centroids[key][i]
-        #return np.add(c_1, c_2) / 2
         return np.mean([c_1, c_2], axis=0)
 
     def __split_hyperplane(self, c_1: np.ndarray, c_2: np.ndarray, p: np.ndarray) -> np.ndarray:
@@ -446,6 +441,8 @@ class Node:
         #print(f"lts1:\n {lts1}")
 
         #row0, row1 = lts0.shape[0], lts1.shape[0]
+
+        del preds #FIX memory issues
 
         #return lts0.reshape(row0, self.__num_features + 1), lts1.reshape(row1, self.__num_features + 1)
         return lts0, lts1
@@ -647,7 +644,7 @@ def main() -> None:
 
     #print(root)
 
-    root.train(250, 5, verbose=1, norm=True)
+    root.train(250, 5, verbose=1)
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 

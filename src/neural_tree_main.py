@@ -27,15 +27,14 @@ def main():
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False)
-        dataset = dataset[top_10].to_numpy()
-
+        dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False).to_numpy()
+        #dataset = dataset[top_10].to_numpy()
         print(dataset.shape)
 
         labels, counts = np.unique(dataset[:, dataset.shape[1] - 1], return_counts=True)
         probs = counts / dataset.shape[0]
 
-        nt = NeuralTree(entropy(probs, base=2), dataset.shape[1] - 1, dataset.shape[0], 25)
+        nt = NeuralTree(entropy(probs, base=2), dataset.shape[1] - 1, dataset.shape[0], 5)
         #nt = NeuralTree(5)
         del probs, labels, counts
 
