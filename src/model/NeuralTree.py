@@ -45,8 +45,10 @@ class NeuralTree:
         self.__root.train(data, epochs, self.__wait_epochs, verbose=verbose)
 
     #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
-    def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> Classification:
-        return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
+    def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> np.ndarray:
+        #return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
+        return self.__root.predict(sample, verbose=verbose)
+
 
     #TODO: ampliare le metriche di valutazione nel momento in cui serva
     def evaluate(self, X: np.ndarray, y: np.ndarray, verbose: int = 0) -> float:

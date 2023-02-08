@@ -138,7 +138,7 @@ class Node:
 
             if not len(np.unique(preds)) == 1:
                 #self.__make_acceptable_model(target, preds) #create trained perceptron that considered acceptable
-                self.__make_acceptable_model(X, y, preds) #create trained perceptron that considered acceptable
+                self.__make_acceptable_model(X, y, preds) #create trained perceptron that considered acceptable (perceptron substitution)
                 print(f"Bias accettabile: {self.__nn.get_weight()[1]}")
 
                 #lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
@@ -177,7 +177,7 @@ class Node:
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
 
     #TODO: da sistemare
-    def __make_acceptable_model(self, X, y_true: np.ndarray, y_pred: np.ndarray) -> None:
+    def __make_acceptable_model(self, X: np.ndarray, y_true: np.ndarray, y_pred: np.ndarray) -> None:
         """
         This function create model created by perceptron that is considered acceptable. To do this I have to check the follow condition:
             E_t <= E_0 / 2 and (E_max - E_min) <= E_t
@@ -198,7 +198,9 @@ class Node:
 
         :return: true if the two partitions are almost balanced, otherwise
         """
-        old_weight = np.append(self.__nn.get_weight()[0], self.__nn.get_weight()[1])
+        #print(X)
+
+        old_weight = self.__nn.get_weight()
         tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
         #print(self.__nn.get_weight()[1])
         K_t = y_true.shape[0]
@@ -211,9 +213,12 @@ class Node:
         # compute centroid of the local training set
         centroid = self.__get_centroid(X)
 
+        #print(self.__nn.get_weight())
+
         # compute the new hyperplane passing throw centroid
-        hyperplane = np.append(self.__nn.get_weight()[0], centroid.dot(self.__nn.get_weight()[0]))
+        hyperplane = np.append(self.__nn.get_weight()[: self.__num_features], centroid.dot(self.__nn.get_weight()[: self.__num_features]))
         self.__nn.reinit_weights(hyperplane) # perceptron substitution
+        #print(self.__nn.get_weight())
 
         preds = self.__nn.predict(X, verbose=1)
 
@@ -447,11 +452,13 @@ class Node:
         #return lts0.reshape(row0, self.__num_features + 1), lts1.reshape(row1, self.__num_features + 1)
         return lts0, lts1
 
-    def predict(self, X, verbose: int = 0) -> Classification:
+    def predict(self, X: np.ndarray, verbose: int = 0) -> np.ndarray:
+        #TODO: fare in modo che funzioni su input composto da moltepici sample
+
         if self.__type == NodeType.LEAF:
-            return self.__label
+            return self.__label.value
         else:
-            if self.__nn.predict(X) >= self.__threshold:
+            if self.__nn.predict(X) == 1:
                 #return self.__childs[0].predict(X, verbose=verbose)
                 return self.__left.predict(X, verbose=verbose)
             else:
