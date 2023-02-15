@@ -15,8 +15,8 @@ import Node
 
 import numpy as np
 import uuid
-#import cv2 as cv
 import math
+import time
 
 @dataclass
 class Node:
@@ -238,6 +238,8 @@ class Node:
         print(f"E_0 = {E_0}")
         print(f"E_0 / 2 = {E_0/2}")
         print(f"E_t = {E_t}")
+        print(f"K_ci = {K_ci}")
+        print(f"K_ti = {K_ti}")
         print(f"E_max - E_min = {E_max - E_min}")
 
 
@@ -452,14 +454,22 @@ class Node:
         #return lts0.reshape(row0, self.__num_features + 1), lts1.reshape(row1, self.__num_features + 1)
         return lts0, lts1
 
-    def predict(self, X: np.ndarray, verbose: int = 0) -> np.ndarray:
+    def predict(self, X: np.ndarray, verbose: int = 0): #-> float:
+        X = X.reshape(1, -1)
+        #preds = self.__nn.predict(X)
+
+
         if self.__type == NodeType.LEAF:
             return self.__label.value
         else:
+            #return np.where(preds == 1, self.__left.predict(X), self.__right.predict(X))
+
             if self.__nn.predict(X) == 1.0:
                 return self.__left.predict(X, verbose=verbose)
             else:
                 return self.__right.predict(X, verbose=verbose)
+
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 

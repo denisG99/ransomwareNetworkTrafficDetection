@@ -1,8 +1,10 @@
+from numpy import ndarray
+
 from Node import Node
 from Classification import Classification
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Tuple
 
 import pandas as pd
 import numpy as np
@@ -47,13 +49,17 @@ class NeuralTree:
     def train(self,data: np.ndarray, epochs: int, verbose: int = 0) -> None:
         self.__root.train(data, epochs, self.__wait_epochs, verbose=verbose)
 
-    def make_predictions(self, samples: np.ndarray, verbose: int = 0) -> np.ndarray:
-        preds = np.array([])
+    def make_predictions(self, samples: np.ndarray, verbose: int = 0):
+        #preds = np.array([])
+        #tot_time = 0
 
-        for sample in samples:
-            preds = np.append(preds, self.__root.predict(sample.reshape(1, -1),verbose=verbose))
+        #for sample in samples:
+         #   pred = self.__root.predict(sample.reshape(1, -1), verbose=verbose)
+          #  preds = np.append(preds, pred)
+            #tot_time += time
 
-        return preds
+        #return preds#, tot_time
+        return np.apply_along_axis(self.__root.predict, 1, samples)
 
 
     #TODO: ampliare le metriche di valutazione nel momento in cui serva
