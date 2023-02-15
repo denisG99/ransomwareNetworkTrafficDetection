@@ -33,6 +33,9 @@ class NeuralTree:
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test
     __wait_epochs : int = 0 #wait epochs that wait before splitting node if the boundaries don't get any improvement
 
+    def get_root(self):
+        return self.__root
+
     def __post_init__(self):
         #data = pd.read_csv(self.__data_path, low_memory=False).to_numpy()
 
@@ -44,10 +47,13 @@ class NeuralTree:
     def train(self,data: np.ndarray, epochs: int, verbose: int = 0) -> None:
         self.__root.train(data, epochs, self.__wait_epochs, verbose=verbose)
 
-    #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
-    def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> np.ndarray:
-        #return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
-        return self.__root.predict(sample, verbose=verbose)
+    def make_predictions(self, samples: np.ndarray, verbose: int = 0) -> np.ndarray:
+        preds = np.array([])
+
+        for sample in samples:
+            preds = np.append(preds, self.__root.predict(sample.reshape(1, -1),verbose=verbose))
+
+        return preds
 
 
     #TODO: ampliare le metriche di valutazione nel momento in cui serva
@@ -86,27 +92,6 @@ class NeuralTree:
         print("CARICAMENTO COMPLETATO!")
 
         return nt
-
-    #def visualize(self, height: int, width: int) -> None:
-        """
-        This function create a visualization of the Neural Tree that follow these rules:
-            * white square -> decision node
-            * blue square -> split node
-            * red circle -> leaf node labeled as malware
-            * green circle -> leaf node labeled as benign
-
-        :param height: image height
-        :param width: image width
-        :return: visualization of the Neural Tree
-        """
-    """
-        img = np.full((height, width, 3), 255, dtype='uint8')
-
-        cv.imshow("Neural Tree visualization", self.__root.visualize_node(img, height, width, 40))
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-     """
-
 
 #-----------------------------------------------------------------------------------------------------------------------
 """
