@@ -1,8 +1,10 @@
+from numpy import ndarray
+
 from Node import Node
 from Classification import Classification
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Tuple
 
 import pandas as pd
 import numpy as np
@@ -16,7 +18,12 @@ class NeuralTree:
         NeuralTree(__entropy,
                    __num_features,
                    __cardinality,
-                   __wait_epochs = 0)
+                   __wait_epochs = 0,
+                   __depth = 0,
+                   __num_nodes = 0,
+                   __num_splitted = 0,
+                   __num_substitution = 0,
+                   __num_leaf = 0)
         """
     __root : Node = field(init=False)
     __entropy: float = field(repr=False)
@@ -24,14 +31,17 @@ class NeuralTree:
     __cardinality : int
     #__data_path : str = field(repr=False)
     #TREE STATISTICS
-    """
     __depth: int = 0 #depth of tree
     __num_nodes : int = 0 #count the number of node
     __num_splitted : int = 0 #count the number of splittin node
+    __num_substitution : int = 0 #count the number of perceptron substitution
     __num_leaf : int = 0 #count the number of leaf node
-    """
+
     #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test
     __wait_epochs : int = 0 #wait epochs that wait before splitting node if the boundaries don't get any improvement
+
+    def get_root(self):
+        return self.__root
 
     def __post_init__(self):
         #data = pd.read_csv(self.__data_path, low_memory=False).to_numpy()
@@ -39,15 +49,30 @@ class NeuralTree:
         #self.__root = Node(data.shape[1] - 1)
         self.__root = Node(self.__entropy, self.__num_features, self.__cardinality)
         del self.__entropy
-        #self.__num_nodes += 1
+        self.__num_nodes += 1
 
     def train(self,data: np.ndarray, epochs: int, verbose: int = 0) -> None:
-        self.__root.train(data, epochs, self.__wait_epochs, verbose=verbose)
+        depth, num_nodes, num_splitted, num_substitution, num_leaf = self.__root.train(data, epochs, self.__wait_epochs, verbose,
+                                                                                       self.__depth, self.__num_nodes, self.__num_splitted,
+                                                                                       self.__num_substitution, self.__num_leaf)
 
-    #TODO: da sitemare e fare in modo di farla andare passando un insieme di sample
-    def make_predictions(self, sample: np.ndarray, verbose: int = 0) -> np.ndarray:
-        #return self.__root.predict(sample.reshape((1, -1)), verbose=verbose)
-        return self.__root.predict(sample, verbose=verbose)
+        self.__depth = depth
+        self.__num_nodes = num_nodes
+        self.__num_splitted = num_splitted
+        self.__num_substitution = num_substitution
+        self.__num_leaf = num_leaf
+
+    def make_predictions(self, samples: np.ndarray, verbose: int = 0):
+        #preds = np.array([])
+        #tot_time = 0
+
+        #for sample in samples:
+         #   pred = self.__root.predict(sample.reshape(1, -1), verbose=verbose)
+          #  preds = np.append(preds, pred)
+            #tot_time += time
+
+        #return preds#, tot_time
+        return np.apply_along_axis(self.__root.predict, 1, samples)
 
 
     #TODO: ampliare le metriche di valutazione nel momento in cui serva
@@ -87,26 +112,13 @@ class NeuralTree:
 
         return nt
 
-    #def visualize(self, height: int, width: int) -> None:
-        """
-        This function create a visualization of the Neural Tree that follow these rules:
-            * white square -> decision node
-            * blue square -> split node
-            * red circle -> leaf node labeled as malware
-            * green circle -> leaf node labeled as benign
-
-        :param height: image height
-        :param width: image width
-        :return: visualization of the Neural Tree
-        """
-    """
-        img = np.full((height, width, 3), 255, dtype='uint8')
-
-        cv.imshow("Neural Tree visualization", self.__root.visualize_node(img, height, width, 40))
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-     """
-
+    def tree_statistic(self):
+        print("STATISTICHE DEL NEURAL TREE")
+        print(f"profondità: {self.__depth}")
+        print(f"numero totale dei nodi: {self.__num_nodes}")
+        print(f"numero di nodi di split: {self.__num_splitted}")
+        print(f"perceptron substitution: {self.__num_substitution}")
+        print(f"numero nodi foglia: {self.__num_leaf}")
 
 #-----------------------------------------------------------------------------------------------------------------------
 """

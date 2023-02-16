@@ -15,8 +15,8 @@ import Node
 
 import numpy as np
 import uuid
-#import cv2 as cv
 import math
+import time
 
 @dataclass
 class Node:
@@ -26,9 +26,7 @@ class Node:
              __num_features,
              __cardinality,
              __label = Classification.NONE,
-             __type = NodeType.DECISION,
-             __threshold = 0.5,
-             __num_classi = 2)
+             __level = 0)
     """
     __id: str = field(init=False, repr=False) #node identifier used in logging
     __nn : NeuralNetwork = field(init=False, repr=False) #perceptron definition
@@ -36,16 +34,16 @@ class Node:
     __left: Node = field(init=False) #left child
     __right: Node = field(init=False) #rigth child
     __is_splitted: bool = field(init=False)  #indicate if node is split
+    __type: NodeType = field(default=NodeType.DECISION, init=False)
     #__is_removed: bool = field(init=False)  #indicate if node has executed pattern removal
     #__patterns: np.ndarray  #field containing training data for perceptron
     __entropy: float # dataset entropy
     __num_features: int  #number of features into dataset
     __cardinality: int # dataset cardinality
     __label: Classification = Classification.NONE
-    __type : NodeType = NodeType.DECISION
-    __threshold : float = 0.5
-    #__toler : float = 0.0 #tollerance that indicate the end of the branch training. Will be use in convergence test #TODO:forse da spostare
-    __num_classi : int = 2
+    #__threshold : float = 0.5
+    #__num_classi : int = 2
+    __level : int = 0
 
     # GETTER & SETTER
     def get_num_features(self) -> int:
@@ -122,7 +120,8 @@ class Node:
 
         return self.__entropy <= (math.log2(n) / n)
 
-    def train(self, data: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0) -> None:
+    def train(self, data: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0,
+              depth: int = 0, num_nodes: int = 0, num_splitted: int = 0, num_substitution: int = 0, num_leaf: int = 0):
         if not self.__type == NodeType.LEAF:
             X = data[:, 0 : self.__num_features]  # patterns dataset
             y = data[:, self.__num_features]  # labels dataset
@@ -141,12 +140,16 @@ class Node:
                 self.__make_acceptable_model(X, y, preds) #create trained perceptron that considered acceptable (perceptron substitution)
                 print(f"Bias accettabile: {self.__nn.get_weight()[1]}")
 
+                if self.__type == NodeType.SUBSTITUTION:
+                    num_substitution += 1
+
                 #lts0, lts1 = self.__dataset_split(self.__patterns, data, verbose=verbose)
                 lts0, lts1 = self.__dataset_split(data, X, verbose=verbose)
             else: #split based on split node
                 print("Creazione split rule")
                 #lts0, lts1 = self.__create_split_node(self.__patterns, data, verbose=verbose)
                 lts0, lts1 = self.__create_split_node(data, X, verbose=verbose)
+                num_splitted += 1
 
             del data, X, y, preds #FIX for momory issues
 
@@ -164,17 +167,22 @@ class Node:
             #self.__right.train(epochs, wait_epochs, verbose=verbose)
 
             entropy, occurs = self.__compute_entropy(lts1)
-            self.__left = Node(entropy, self.__num_features, lts1.shape[0], Classification(max(occurs, key=occurs.get)))
+            self.__left = Node(entropy, self.__num_features, lts1.shape[0], Classification(max(occurs, key=occurs.get)), self.__level + 1)
 
             entropy, occurs = self.__compute_entropy(lts0)
-            self.__right = Node(entropy, self.__num_features, lts0.shape[0], Classification(max(occurs, key=occurs.get)))
+            self.__right = Node(entropy, self.__num_features, lts0.shape[0], Classification(max(occurs, key=occurs.get)), self.__level + 1)
+            depth = max(depth, self.__level + 1)
+            num_nodes += 2
 
-            self.__left.train(lts1, epochs, wait_epochs, verbose=verbose)
-            self.__right.train(lts0, epochs, wait_epochs, verbose=verbose)
+            depth, num_nodes, num_splitted, num_substitution, num_leaf = self.__left.train(lts1, epochs, wait_epochs, verbose, depth, num_nodes, num_splitted, num_substitution, num_leaf)
+            depth, num_nodes, num_splitted, num_substitution, num_leaf = self.__right.train(lts0, epochs, wait_epochs, verbose, depth, num_nodes, num_splitted, num_substitution, num_leaf)
 
             print(f"END TRAINING Node {self.__id}")
-
+        else:
+            num_leaf += 1
         print(f"Node {self.__id} is {self.__type} Node (Label -> {self.__label})")
+
+        return depth, num_nodes, num_splitted, num_substitution, num_leaf
 
     #TODO: da sistemare
     def __make_acceptable_model(self, X: np.ndarray, y_true: np.ndarray, y_pred: np.ndarray) -> None:
@@ -238,6 +246,8 @@ class Node:
         print(f"E_0 = {E_0}")
         print(f"E_0 / 2 = {E_0/2}")
         print(f"E_t = {E_t}")
+        print(f"K_ci = {K_ci}")
+        print(f"K_ti = {K_ti}")
         print(f"E_max - E_min = {E_max - E_min}")
 
 
@@ -320,6 +330,7 @@ class Node:
 
         lts0, lts1 = self.__dataset_split(lts, X, verbose=verbose)
         self.__is_splitted = True
+        self.__type = NodeType.SPLIT
 
         del lts, X, c_0, c_1, center #FIX memory issues
 
@@ -452,175 +463,23 @@ class Node:
         #return lts0.reshape(row0, self.__num_features + 1), lts1.reshape(row1, self.__num_features + 1)
         return lts0, lts1
 
-    def predict(self, X: np.ndarray, verbose: int = 0) -> np.ndarray:
-        #TODO: fare in modo che funzioni su input composto da moltepici sample
+    def predict(self, X: np.ndarray, verbose: int = 0): #-> float:
+        X = X.reshape(1, -1)
+        #preds = self.__nn.predict(X)
+
 
         if self.__type == NodeType.LEAF:
             return self.__label.value
         else:
-            if self.__nn.predict(X) == 1:
-                #return self.__childs[0].predict(X, verbose=verbose)
+            #return np.where(preds == 1, self.__left.predict(X), self.__right.predict(X))
+
+            if self.__nn.predict(X) == 1.0:
                 return self.__left.predict(X, verbose=verbose)
             else:
-                #return self.__childs[1].predict(X, verbose=verbose)
                 return self.__right.predict(X, verbose=verbose)
 
-    #TODO: refactoring della funzione in modo tale da farla più elegnate
-    #FUNCTION DOESN'T WORK
-   # def visualize_node(self, img, height: int, width: int, dim: int, is_left: bool = False, is_right: bool = False, level: int = 0) -> np.ndarray:
-        """
-        This function create a visualization of Node that follow these rules:
-            * white rectangle -> decision node
-            * blue rectangle -> split node
-            * red circle -> leaf node labeled as malware
-            * green circle -> leaf node labeled as benign
 
-        :param img: image
-        :param height: image height
-        :param width: image width
-        :param dim: for circle indicate radius instead for rectangle indicate length of square side
-        :param is_left: indicate if the node that I draw is left child
-        :param is_right: indicate if the node that I draw is right child
-        :param level: level of the tree (maintain the default value, otherwise it draws the tree lower in resulting image)
-        """
-        """
-        offset = 10
-        #offset used in drawing child
-        x_offset = (dim // 2)
-        y_offset = offset + dim + (dim // 2)
 
-        if not self.__left is None and not self.__right is None:
-            if self.get_type() == NodeType.LEAF:
-                if self.get_label() == Classification.MALWARE:
-                    if is_left and not is_right:
-                        img = cv.circle(img,  # image
-                                        (((width // 2) - (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
-                                        (dim // 2),  # radius
-                                        (0, 0, 255),  # color
-                                        -1)  # thickness
-                    elif is_right and not is_left:
-                        img = cv.circle(img,  # image
-                                        (((width // 2) + (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
-                                        (dim // 2),  # radius
-                                        (0, 0, 255),  # color
-                                        -1)  # thickness
-                    else:
-                        img = cv.circle(img,  # image
-                                        (width // 2, ((dim // 2) + offset)),  # center_coordinates
-                                        (dim // 2),  # radius
-                                        (0, 0, 255),  # color
-                                        -1)  # thickness
-                else:
-                    if is_left and not is_right:
-                         img = cv.circle(img, #image
-                                          (((width // 2) - (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
-                                          (dim // 2), #radius
-                                          (0, 255, 0), #color
-                                          -1) #thickness
-                    elif is_right and not is_left:
-                        img = cv.circle(img,  # image
-                                        (((width // 2) + (x_offset * level)), (((dim // 2) + offset) * level)),  # center_coordinates
-                                        (dim // 2),  # radius
-                                        (0, 255, 0),  # color
-                                        -1)  # thicknessù
-                    else:
-                        img = cv.circle(img,  # image
-                                        (width // 2, ((dim // 2) + offset)),  # center_coordinates
-                                        (dim // 2),  # radius
-                                        (0, 255, 0),  # color
-                                        -1)  # thickness
-
-            elif self.get_type() == NodeType.DECISION:
-                if is_left and not is_right:
-                    img = cv.rectangle(img, #image
-                                        ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), #start_point
-                                        ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)), #end_point
-                                        (0, 0, 0), #color
-                                        2) #thickness
-                elif is_right and not is_left:
-                    img = cv.rectangle(img,  # image
-                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)),  # start_point
-                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
-                                       (0, 0, 0),  # color
-                                       2)  # thickness
-                else:
-                    img = cv.rectangle(img,  # image
-                                       ((width // 2) - (dim // 2), offset),  # start_point
-                                       ((width // 2) + (dim // 2), dim + offset),  # end_point
-                                       (0, 0, 0),  # color
-                                       2)  # thickness
-
-            elif self.get_type() == NodeType.SPLIT:
-                if is_left and not is_right:
-                    img = cv.rectangle(img,  # image
-                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), # start_point
-                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
-                                       (0, 0, 0),  # color
-                                       -1)  # thickness
-                elif is_right and not is_left:
-                    img = cv.rectangle(img,  # image
-                                       ((width // 2) - (dim // 2) + (x_offset * level), offset + (y_offset * level)), # start_point
-                                       ((width // 2) + (dim // 2) + (x_offset * level), dim + offset + (y_offset * level)),  # end_point
-                                       (0, 0, 0),  # color
-                                       -1)  # thickness
-                else:
-                    img = cv.rectangle(img,  # image
-                                       ((width // 2) - (dim // 2), offset),  # start_point
-                                       ((width // 2) + (dim // 2), dim + offset),  # end_point
-                                       (0, 0, 0),  # color
-                                       -1)  # thickness
-
-            if is_left and not is_right:
-                #draw left child line
-                img = cv.line(img, #image
-                               ((width // 2) - (x_offset * level), offset + dim + (y_offset * level)), #start_point
-                               ((width // 2) - (dim // 2) - (x_offset * level), offset + dim + (dim // 2) + (y_offset * level)), #end point
-                               (0, 0, 0), #color
-                               2) #thickness
-
-                #draw right child line
-                img = cv.line(img,  # image
-                              ((width // 2) - (x_offset * level), offset + dim + (y_offset * level)),  # start_point
-                              ((width // 2) + (dim // 2) - (x_offset * level), offset + (dim // 2) + dim + (y_offset * level)), #end_point
-                              (0, 0, 0),  # color
-                              2)  # thickness
-            elif is_right and not is_left:
-                # draw left child line
-                img = cv.line(img,  # image
-                              ((width // 2) + (x_offset * level), offset + dim + (y_offset * level)),  # start_point
-                              ((width // 2) + (dim // 2) + (x_offset * level), offset + dim + (dim // 2) + (y_offset * level)),
-                              # ((width // 2), dim + offset ), #end_point
-                              (0, 0, 0),  # color
-                              2)  # thickness
-
-                # draw right child line
-                img = cv.line(img,  # image
-                              ((width // 2) + (x_offset * level), offset + dim + (y_offset * level)),  # start_point
-                              ((width // 2) + (dim // 2) + (x_offset * level), offset + (dim // 2) + dim + (y_offset * level)),  # end_point
-                              (0, 0, 0),  # color
-                              2)  # thickness
-            else:
-                # draw left child line
-                img = cv.line(img,  # image
-                              ((width // 2), offset + dim),  # start_point
-                              ((width // 2) - (dim // 2), offset + dim + (dim // 2)),
-                              # ((width // 2), dim + offset ), #end_point
-                              (0, 0, 0),  # color
-                              2)  # thickness
-
-                # draw right child line
-                img = cv.line(img,  # image
-                              ((width // 2), offset + dim),  # start_point
-                              ((width // 2) + (dim // 2), offset + (dim // 2) + dim),  # end_point
-                              (0, 0, 0),  # color
-                              2)  # thickness
-
-            level += 1
-            #img = self.__left.visualize_node(img, height, width, dim, is_left=True, is_right=False, level=level)
-            img= self.__right.visualize_node(img, height, width, dim, is_left=False, is_right=True, level=level)
-
-        return img
-    """
 #-----------------------------------------------------------------------------------------------------------------------
 
 def main() -> None:
@@ -632,7 +491,7 @@ def main() -> None:
     import numpy as np
 
 
-    patterns = pd.read_csv("../../csv/train.csv").to_numpy()
+
     #print(patterns)
     #print(patterns.shape)
     #X, y = make_moons(100)
@@ -646,12 +505,13 @@ def main() -> None:
 
     #patterns = np.append(X_train, np.reshape(y_train, (-1, 1)), axis=1)
 
-    root = Node(patterns, patterns.shape[1] - 1)
+    patterns = pd.read_csv("../../csv/train.csv").to_numpy()
+    root = Node(1, patterns.shape[1]-1, patterns.shape[0], Classification.NONE, NodeType.DECISION, 0)
     #X, y = patterns[0], patterns[1]
 
-    #print(root)
+    print(root)
 
-    root.train(250, 5, verbose=1)
+    #root.train(250, 5, verbose=1)
     #lts0, lts1, centroids, center = root.create_split_node(patterns, X)
     #print(root)
 

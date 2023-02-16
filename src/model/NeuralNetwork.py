@@ -43,7 +43,7 @@ class NeuralNetwork:
 
         #for i in range(self.__num_perceptrons):
          #   self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1, early_stopping=True, n_iter_no_change=5, tol=1e-4) #TODO: mettere learning rate personalizzabile (eta0; )
-        self.__model = Perceptron(max_iter=250, verbose=1, n_iter_no_change=10 ,eta0=0.1)
+        self.__model = Perceptron(max_iter=250, verbose=1, n_iter_no_change=5, eta0=0.1, tol=0.0001)
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
@@ -52,11 +52,7 @@ class NeuralNetwork:
          #            CSVLogger("log.csv", separator=',', append=False)]
 
         #hystory = self.__model.fit(X, y, epochs=epochs, verbose=verbose, validation_split=0.1, callbacks=callbacks)
-        weight = self.__glorot_uniform(self.__num_input_features, self.__num_perceptrons)
-
-        print(weight)
-
-        self.__model.fit(X, y, coef_init= weight, intercept_init=1)
+        self.__model.fit(X, y, coef_init= self.__glorot_uniform(self.__num_input_features, self.__num_perceptrons), intercept_init=1)
         #for perceptron in self.__perceptrons:
          #   model = perceptron.fit(X, y)
 
@@ -80,8 +76,8 @@ class NeuralNetwork:
         Compute Glorot-Xavier weight initializer with uniform distibution
 
         :param fan_in: input nodes
-        :param fan_out: output nodes
-        :return:
+        :param fan_out: output nodes depending on a single output node
+        :return: array containing weight
         """
         scale = np.sqrt(6.0 / (fan_in + fan_out))
 
@@ -149,10 +145,8 @@ def main() -> None:
 
     nn.fit(X_train, y_train, 500, 5)
 
-    print(nn.get_weight())
-
+    #print(nn.get_weight())
     print(nn.predict(X_test))
-    #print(nn.predict(X_test))
 
     #print(f"Training -> {nn.evaluate(X_train, y_train)}")
     #print(f"Testing -> {nn.evaluate(X_test, y_test)}")
@@ -183,8 +177,6 @@ def main() -> None:
     #print(nn.get_weight())
     #nn.reinit_weights(np.array([0, 0, 0]))
     #print(nn.get_weight())
-    #print(nn.predict(X_test))
-
 
 if __name__ == "__main__":
     main()
