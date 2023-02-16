@@ -28,11 +28,11 @@ def main():
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        #X, y = make_moons(100)
+        X, y = make_moons(100)
 
-        #dataset = np.append(X, y.reshape(len(y), 1), axis=1)
+        dataset = np.append(X, y.reshape(len(y), 1), axis=1)
         #dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False).to_numpy()
-        dataset = pd.read_csv("./model/toydata.csv", low_memory=False).to_numpy()
+        #dataset = pd.read_csv("./model/toydata.csv", low_memory=False).to_numpy()
         #dataset = dataset[top_10].to_numpy()
         #print(dataset)
 
