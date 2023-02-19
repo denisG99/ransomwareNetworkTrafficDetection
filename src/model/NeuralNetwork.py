@@ -43,7 +43,7 @@ class NeuralNetwork:
 
         #for i in range(self.__num_perceptrons):
          #   self.__perceptrons[i] = Perceptron(verbose=1, eta0=.1, early_stopping=True, n_iter_no_change=5, tol=1e-4) #TODO: mettere learning rate personalizzabile (eta0; )
-        self.__model = Perceptron(max_iter=250, verbose=1, n_iter_no_change=5, eta0=0.1, tol=0.0001)
+        self.__model = Perceptron(max_iter=250, verbose=0, n_iter_no_change=5, eta0=0.1, tol=0.0001)
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int, wait_epochs: int, verbose: int = 0):
         #early stopping is useful for reduce training time and save time
