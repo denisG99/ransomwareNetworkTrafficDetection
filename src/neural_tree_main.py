@@ -23,15 +23,15 @@ top_30 = ['Fwd Pkt Len Min', 'Dst Port', 'Flow Iat Mean', 'Pkt Len Min', 'Bwd Pk
 
 def main():
     try:
-        with open(f"{EXPORTED_MODEL}/nt_unbalance.pkl", 'rb') as _:
+        with open(f"{EXPORTED_MODEL}/nt_unbalance10.pkl", 'rb') as _:
             print("CARICAMENTO MODELLO DA ../exported_model/nt_unbalance.pkl")
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        X, y = make_moons(100)
+        #X, y = make_moons(100)
 
-        dataset = np.append(X, y.reshape(len(y), 1), axis=1)
-        #dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False).to_numpy()
+        #dataset = np.append(X, y.reshape(len(y), 1), axis=1)
+        dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False).to_numpy()
         #dataset = pd.read_csv("./model/toydata.csv", low_memory=False).to_numpy()
         #dataset = dataset[top_10].to_numpy()
         #print(dataset)
@@ -50,8 +50,8 @@ def main():
 
         print(f"L'addestramento del Neural Tree ha impiegato {time.time() - start_time} secondi")
 
-        print("SALVATAGGIO MODELLO IN ../exported_model/nt_unbalance.pkl")
-        nt.save_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
+        print("SALVATAGGIO MODELLO IN ../exported_model/nt_unbalance10.pkl")
+        nt.save_model(f"{EXPORTED_MODEL}/nt_unbalance10.pkl")
         nt.tree_statistic()
         #print(nt)
 

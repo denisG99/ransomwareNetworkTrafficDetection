@@ -64,6 +64,9 @@ class Node:
     def get_label(self):
         return self.__label
 
+    def get_id(self):
+        return self.__id
+
 #-----------------------------------------------------------------------
 
     def __post_init__(self):
