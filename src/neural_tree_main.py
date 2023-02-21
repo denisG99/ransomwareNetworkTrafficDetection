@@ -1,8 +1,6 @@
 import os
 import sys
 
-from sklearn.datasets import make_moons
-
 sys.path.insert(0, os.path.abspath('./model'))
 
 import pandas as pd
@@ -20,7 +18,6 @@ top_10 = ['Protocol', 'Bwd Header Len', 'Flow Iat Max', 'Bwd Pkts S', 'Flow Byts
 top_20 = ['Pkt Len Var', 'Subflow Fwd Byts', 'Totlen Bwd Pkts', 'Pkt Len Std', 'Fwd Header Len.1', 'Fwd Seg Size Min', 'Tot Bwd Pkts', 'Fwd Iat Max', 'Fwd Header Len', 'Bwd Pkt Len Max', 'Protocol', 'Bwd Header Len', 'Flow Iat Max', 'Bwd Pkts S', 'Flow Byts S', 'Timestamp', 'Flow Pkts S', 'Fwd Pkts S', 'Flow Duration', 'Src Ip']
 top_30 = ['Fwd Pkt Len Min', 'Dst Port', 'Flow Iat Mean', 'Pkt Len Min', 'Bwd Pkt Len Min', 'Dst Ip', 'Bwd Seg Size Avg', 'Subflow Bwd Byts', 'Bwd Pkt Len Mean', 'Fwd Iat Mean', 'Pkt Len Var', 'Subflow Fwd Byts', 'Totlen Bwd Pkts', 'Pkt Len Std', 'Fwd Header Len.1', 'Fwd Seg Size Min', 'Tot Bwd Pkts', 'Fwd Iat Max', 'Fwd Header Len', 'Bwd Pkt Len Max', 'Protocol', 'Bwd Header Len', 'Flow Iat Max', 'Bwd Pkts S', 'Flow Byts S', 'Timestamp', 'Flow Pkts S', 'Fwd Pkts S', 'Flow Duration', 'Src Ip']
 
-
 def main():
     try:
         with open(f"{EXPORTED_MODEL}/nt_unbalance10.pkl", 'rb') as _:
@@ -28,19 +25,12 @@ def main():
 
             nt = NeuralTree.load_model(f"{EXPORTED_MODEL}/nt_unbalance.pkl")
     except IOError:
-        #X, y = make_moons(100)
-
-        #dataset = np.append(X, y.reshape(len(y), 1), axis=1)
         dataset = pd.read_csv(f"{DATASET_PATH}/train.csv", low_memory=False).to_numpy()
-        #dataset = pd.read_csv("./model/toydata.csv", low_memory=False).to_numpy()
-        #dataset = dataset[top_10].to_numpy()
-        #print(dataset)
 
         labels, counts = np.unique(dataset[:, dataset.shape[1] - 1], return_counts=True)
         probs = counts / dataset.shape[0]
 
         nt = NeuralTree(entropy(probs, base=2), dataset.shape[1] - 1, dataset.shape[0], 0)
-        #nt = NeuralTree(5)
         del probs, labels, counts
 
         start_time = time.time()
@@ -53,7 +43,6 @@ def main():
         print("SALVATAGGIO MODELLO IN ../exported_model/nt_unbalance10.pkl")
         nt.save_model(f"{EXPORTED_MODEL}/nt_unbalance10.pkl")
         nt.tree_statistic()
-        #print(nt)
 
 if __name__ == "__main__":
     main()

@@ -26,8 +26,6 @@ def feature_extract(path, traffic_type):
             os.remove(f"{path}/{file}")
         elif file.endswith(".pcap"):
             cmd = f"cicflowmeter -f {path}/{file} -c {ARCHIVE_DEST_PATH}/{traffic_type}/{file.replace('.pcap', '.csv')}"
-            #COMANDO TEST
-            #cmd = f"cicflowmeter -f ../prova/{file} -c ../prova/{traffic_type}/{file.replace('.pcap', '.csv')}"
             status_code = os.system(cmd)
 
             logger.log_writer(f"{path}/{file}", status_code)
@@ -65,8 +63,6 @@ def main():
                 elif archive.endswith('.gz'):
                     unzip_pcap(f'{ARCHIVE_PATH_MALWARE}/{subdir}/{subsubdir}/{archive}', type='gz')
     feature_extract(ARCHIVE_PATH_MALWARE, 'malware')
-    #feature_extract("../prova", 'malware') #esecuzione di test
-
 
 if __name__ == "__main__":
     main()
