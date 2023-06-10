@@ -37,7 +37,7 @@ imblearn==0.0
 importlib-metadata==5.0.0
 importlib-resources==5.10.0
 ipykernel==6.10.0
-ipython==8.2.0
+ipython==8.10.0
 ipython-genutils==0.2.0
 ipywidgets==7.7.0
 jedi==0.18.2
