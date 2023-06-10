@@ -60,7 +60,7 @@ MarkupSafe==2.1.1
 matplotlib==3.5.1
 matplotlib-inline==0.1.3
 mistuneF
-mpmath==1.2.1
+mpmath==1.3.0
 nbclient==0.5.13
 nbconvert==6.4.5
 nbformat==5.2.0
